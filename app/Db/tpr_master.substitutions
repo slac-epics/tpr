@@ -1,0 +1,22 @@
+file tpr_config.db
+{
+pattern {  BASE   }
+        { $(BASE) }
+}
+
+file tpr_ch_config.db
+{
+pattern {  BASE,  N }
+        { $(BASE) 0 },
+        { $(BASE) 1 },
+        { $(BASE) 2 },
+        { $(BASE) 3 },
+        { $(BASE) 4 },
+        { $(BASE) 5 },
+        { $(BASE) 6 },
+        { $(BASE) 7 },
+        { $(BASE) 8 },
+        { $(BASE) 9 },
+        { $(BASE) A },
+        { $(BASE) B }
+}

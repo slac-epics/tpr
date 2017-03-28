@@ -1,0 +1,37 @@
+#
+# Records for configuring a TPR.
+# Macros: BASE - Base PV
+#         CARD - TPR card number
+#
+record(bo, "$(BASE):COUNT_RESET")
+{
+  field(DESC, "TPR Counter Reset")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) -1 CRESET")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "No Reset")
+  field(ONAM, "Reset")
+}
+
+record(bo, "$(BASE):XBAR_STRAIGHT")
+{
+  field(DESC, "TPR Xbar Setting")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) -1 XBAR")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Crossed")
+  field(ONAM, "Straight")
+}
+
+record(bo, "$(BASE):TIMING_MODE")
+{
+  field(DESC, "TPR Input Setting")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) -1 MODE")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "LCLS-I")
+  field(ONAM, "LCLS-II")
+}

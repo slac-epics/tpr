@@ -1,0 +1,179 @@
+#
+# Records for configuring a single TPR channel.
+# Macros: BASE - Base PV
+#         CARD - TPR card number
+#         N    - Channel number
+#
+record(bo, "$(BASE):CH$(N):ENABLE")
+{
+  field(DESC, "TPR Channel $(N) Enable")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) ENABLE")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+record(bo, "$(BASE):CH$(N):ENABLE_BSA")
+{
+  field(DESC, "TPR Channel $(N) BSA Enable")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) BSAEN")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+record(bo, "$(BASE):CH$(N):ENABLE_TRIG")
+{
+  field(DESC, "TPR Channel $(N) Trigger Enable")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) TRIGEN")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+record(mbbo, "$(BASE):CH$(N):EVENT_SELECT")
+{
+  field(DESC, "TPR Channel $(N) Event Select")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) EVENT")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZRST, "929 kHz")
+  field(ZRSV, "MAJOR")
+  field(ONST, "71.5 kHz")
+  field(ONSV, "MAJOR")
+  field(TWST, "10 kHz")
+  field(TWSV, "MAJOR")
+  field(THST, "1 kHz")
+  field(THSV, "MAJOR")
+  field(FRST, "100 Hz")
+  field(FVST, "10 Hz")
+  field(SXST, "1 Hz")
+  field(SVST, "60 Hz")
+  field(EIST, "30 Hz")
+  field(NIST, "10 Hz")
+  field(TEST, "5 Hz")
+  field(ELST, "1 Hz")
+  field(TWST, "0.5 Hz")
+  field(TTST, "Sequence")
+  field(FTST, "ERROR")
+  field(TTSV, "INVALID")
+  field(FFST, "ERROR")
+  field(TTSV, "INVALID")
+  field(UNSV, "INVALID")
+}
+
+record(mbbo, "$(BASE):CH$(N):DEST")
+{
+  field(DESC, "TPR Channel $(N) Dest Mask")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) DMASK")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZRST, "State 0")
+  field(ZRVL, "0")
+  field(ONST, "State 1")
+  field(ONVL, "1")
+  field(TWST, "State 2")
+  field(TWVL, "2")
+  field(THST, "State 3")
+  field(THVL, "3")
+  field(FRST, "State 4")
+  field(FRVL, "4")
+  field(FVST, "State 5")
+  field(FVVL, "5")
+}
+
+#
+# Probably need to document this somehow?
+#
+record(mbboDirect, "$(BASE):CH$(N):DEST_MODE")
+{
+  field(DESC, "TPR Channel $(N) Dest Mode")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) DMODE")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+}
+
+record(mbboDirect, "$(BASE):CH$(N):TSMASK")
+{
+  field(DESC, "TPR Channel $(N) TS MASK")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) TSMASK")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+}
+
+record(longout, "$(BASE):CH$(N):SEQ")
+{
+  field(DESC,  "TPR Channel $(N) seq bit")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) SEQ")
+  field(OMSL,  "supervisory")
+}
+
+record(longout, "$(BASE):CH$(N):BSA_DELAY")
+{
+  field(DESC,  "TPR Channel $(N) BSA Delay")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) BSADEL")
+  field(OMSL,  "supervisory")
+}
+
+record(longout, "$(BASE):CH$(N):BSA_WIDTH")
+{
+  field(DESC,  "TPR Channel $(N) BSA Width")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) BSAWID")
+  field(OMSL,  "supervisory")
+}
+
+record(bo, "$(BASE):CH$(N):POLARITY")
+{
+  field(DESC, "TPR Channel $(N) Polarity")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) POL")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(ZNAM, "Positive")
+  field(ONAM, "Negative")
+}
+
+record(longout, "$(BASE):CH$(N):TRIG_WIDTH_TICKS")
+{
+  field(DESC,  "TPR Channel $(N) Trigger Width")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) TRGWID")
+  field(OMSL,  "supervisory")
+}
+
+record(longout, "$(BASE):CH$(N):TRIG_DELAY_TICKS")
+{
+  field(DESC,  "TPR Channel $(N) Trigger Delay")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) TRGDEL")
+  field(OMSL,  "supervisory")
+}
+
+record(longout, "$(BASE):CH$(N):TRIG_FINE_DELAY")
+{
+  field(DESC,  "TPR Channel $(N) Trigger Fine Delay")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) TRGFDEL")
+  field(OMSL,  "supervisory")
+}
+
+record(longin, "$(BASE):CH$(N):CHANGE")
+{
+  field(DESC,  "TPR Channel $(N) Trigger Fine Delay")
+  field(DTYP, "TPR Master")
+  field(OUT,  "#$(CARD) $(N) TRGFDEL")
+  field(OMSL,  "supervisory")
+}

@@ -10,7 +10,7 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-# DB += ipimb.db
+DB += tpr_master.db
 
 #----------------------------------------------------
 # Create and install (or just install)
