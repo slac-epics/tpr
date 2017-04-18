@@ -1,47 +1,51 @@
 #
 # Records for configuring a single TPR channel.
-# Macros: BASE - Base PV
-#         CARD - TPR card number
-#         N    - Channel number
+# Macros: BASE  - Base PV
+#         CARD  - TPR card number
+#         N     - Channel number
+#         L     - LCLS1/LCLS2 indicator
+#         RATE  - Tick frequency
+#         FSTAT - Fixed rate alarm status.
+#         ASTAT - AC 0.5 Hz alarm status.
 #
-record(bo, "$(BASE):CH$(N):ENABLE")
+record(bo, "$(BASE):LCLS$(L):CH$(N):ENABLE")
 {
   field(DESC, "TPR Channel $(N) Enable")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) ENABLE")
+  field(OUT,  "@$(CARD) $(L) $(N) ENABLE")
   field(PINI, "YES")
   field(OMSL, "supervisory")
   field(ZNAM, "Off")
   field(ONAM, "On")
 }
 
-record(bo, "$(BASE):CH$(N):ENABLE_BSA")
+record(bo, "$(BASE):LCLS$(L):CH$(N):ENABLE_BSA")
 {
   field(DESC, "TPR Channel $(N) BSA Enable")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) BSAEN")
+  field(OUT,  "@$(CARD) $(L) $(N) BSAEN")
   field(PINI, "YES")
   field(OMSL, "supervisory")
   field(ZNAM, "Off")
   field(ONAM, "On")
 }
 
-record(bo, "$(BASE):CH$(N):ENABLE_TRIG")
+record(bo, "$(BASE):LCLS$(L):CH$(N):ENABLE_TRIG")
 {
   field(DESC, "TPR Channel $(N) Trigger Enable")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) TRIGEN")
+  field(OUT,  "@$(CARD) $(L) $(N) TRIGEN")
   field(PINI, "YES")
   field(OMSL, "supervisory")
   field(ZNAM, "Off")
   field(ONAM, "On")
 }
 
-record(mbbo, "$(BASE):CH$(N):EVENT_SELECT")
+record(mbbo, "$(BASE):LCLS$(L):CH$(N):EVENT_SELECT")
 {
   field(DESC, "TPR Channel $(N) Event Select")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) EVENT")
+  field(OUT,  "@$(CARD) $(L) $(N) EVENT")
   field(PINI, "YES")
   field(OMSL, "supervisory")
   field(ZRST, "929 kHz")
@@ -53,127 +57,221 @@ record(mbbo, "$(BASE):CH$(N):EVENT_SELECT")
   field(THST, "1 kHz")
   field(THSV, "MAJOR")
   field(FRST, "100 Hz")
+  field(FRSV, "$(FSTAT)")
   field(FVST, "10 Hz")
+  field(FVSV, "$(FSTAT)")
   field(SXST, "1 Hz")
+  field(SXSV, "$(FSTAT)")
   field(SVST, "60 Hz")
   field(EIST, "30 Hz")
   field(NIST, "10 Hz")
   field(TEST, "5 Hz")
   field(ELST, "1 Hz")
   field(TWST, "0.5 Hz")
+  field(TWSV, "$(ASTAT)")
   field(TTST, "Sequence")
   field(FTST, "ERROR")
-  field(TTSV, "INVALID")
+  field(FTSV, "INVALID")
   field(FFST, "ERROR")
-  field(TTSV, "INVALID")
+  field(FFSV, "INVALID")
   field(UNSV, "INVALID")
-}
-
-record(mbbo, "$(BASE):CH$(N):DEST")
-{
-  field(DESC, "TPR Channel $(N) Dest Mask")
-  field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) DMASK")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZRST, "State 0")
-  field(ZRVL, "0")
-  field(ONST, "State 1")
-  field(ONVL, "1")
-  field(TWST, "State 2")
-  field(TWVL, "2")
-  field(THST, "State 3")
-  field(THVL, "3")
-  field(FRST, "State 4")
-  field(FRVL, "4")
-  field(FVST, "State 5")
-  field(FVVL, "5")
 }
 
 #
 # Probably need to document this somehow?
 #
-record(mbboDirect, "$(BASE):CH$(N):DEST_MODE")
+record(mbbo, "$(BASE):LCLS$(L):CH$(N):DEST")
+{
+  field(DESC, "TPR Channel $(N) Dest Mask")
+  field(DTYP, "TPR Master")
+  field(OUT,  "@$(CARD) $(L) $(N) DMASK")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+}
+
+record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):DEST_MODE")
 {
   field(DESC, "TPR Channel $(N) Dest Mode")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) DMODE")
+  field(OUT,  "@$(CARD) $(L) $(N) DMODE")
   field(PINI, "YES")
   field(OMSL, "supervisory")
+  field(ZRST, "Inclusive")
+  field(ONST, "Exclusive")
+  field(TWST, "Don't Care")
+  field(THST, "ERROR")
+  field(THSV, "INVALID")
+  field(FRST, "ERROR")
+  field(FRSV, "INVALID")
+  field(FVST, "ERROR")
+  field(FVSV, "INVALID")
+  field(SXST, "ERROR")
+  field(SXSV, "INVALID")
+  field(SVST, "ERROR")
+  field(SVSV, "INVALID")
+  field(EIST, "ERROR")
+  field(EISV, "INVALID")
+  field(NIST, "ERROR")
+  field(NISV, "INVALID")
+  field(TEST, "ERROR")
+  field(TESV, "INVALID")
+  field(ELST, "ERROR")
+  field(ELSV, "INVALID")
+  field(TWST, "ERROR")
+  field(TWSV, "INVALID")
+  field(TTST, "ERROR")
+  field(TTSV, "INVALID")
+  field(FTST, "ERROR")
+  field(FTSV, "INVALID")
+  field(FFST, "ERROR")
+  field(FFSV, "INVALID")
+  field(FFSV, "ERROR")
+  field(UNSV, "INVALID")
 }
 
-record(mbboDirect, "$(BASE):CH$(N):TSMASK")
+record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):TSMASK")
 {
   field(DESC, "TPR Channel $(N) TS MASK")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) TSMASK")
+  field(OUT,  "@$(CARD) $(L) $(N) TSMASK")
   field(PINI, "YES")
   field(OMSL, "supervisory")
 }
 
-record(longout, "$(BASE):CH$(N):SEQ")
+record(longout, "$(BASE):LCLS$(L):CH$(N):SEQ")
 {
   field(DESC,  "TPR Channel $(N) seq bit")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) SEQ")
+  field(OUT,  "@$(CARD) $(L) $(N) SEQ")
   field(OMSL,  "supervisory")
 }
 
-record(longout, "$(BASE):CH$(N):BSA_DELAY")
+record(ao, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY")
+{
+  field(DESC,  "TPR Channel $(N) BSA Delay")
+  field(EGU,   "us")
+  field(FLNK,  "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT")
+}
+
+field(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT")
+{
+  field(INPA, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY")
+  field(INPB, "$(RATE)")
+  field(CALC, "1000 * A / B")
+  field(OUT,  "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_TICKS PP")
+}
+
+record(longout, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_TICKS")
 {
   field(DESC,  "TPR Channel $(N) BSA Delay")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) BSADEL")
+  field(OUT,  "@$(CARD) $(L) $(N) BSADEL")
   field(OMSL,  "supervisory")
 }
 
-record(longout, "$(BASE):CH$(N):BSA_WIDTH")
+record(ao, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH")
+{
+  field(DESC,  "TPR Channel $(N) BSA Width")
+  field(EGU,   "us")
+  field(FLNK,  "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT")
+}
+
+field(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT")
+{
+  field(INPA, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH")
+  field(INPB, "$(RATE)")
+  field(CALC, "1000 * A / B")
+  field(OUT,  "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_TICKS PP")
+}
+
+record(longout, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_TICKS")
 {
   field(DESC,  "TPR Channel $(N) BSA Width")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) BSAWID")
+  field(OUT,  "@$(CARD) $(L) $(N) BSAWID")
   field(OMSL,  "supervisory")
 }
 
-record(bo, "$(BASE):CH$(N):POLARITY")
+record(bo, "$(BASE):LCLS$(L):CH$(N):POLARITY")
 {
   field(DESC, "TPR Channel $(N) Polarity")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) POL")
+  field(OUT,  "@$(CARD) $(L) $(N) POL")
   field(PINI, "YES")
   field(OMSL, "supervisory")
   field(ZNAM, "Positive")
   field(ONAM, "Negative")
 }
 
-record(longout, "$(BASE):CH$(N):TRIG_WIDTH_TICKS")
+record(ao, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH")
+{
+  field(DESC,  "TPR Channel $(N) Trigger Width")
+  field(EGU,   "us")
+  field(FLNK,  "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT")
+}
+
+field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT")
+{
+  field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH")
+  field(INPB, "$(RATE)")
+  field(CALC, "1000 * A / B")
+  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_TICKS PP")
+}
+
+record(longout, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_TICKS")
 {
   field(DESC,  "TPR Channel $(N) Trigger Width")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) TRGWID")
+  field(OUT,  "@$(CARD) $(L) $(N) TRGWID")
   field(OMSL,  "supervisory")
 }
 
-record(longout, "$(BASE):CH$(N):TRIG_DELAY_TICKS")
+record(ao, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
+{
+  field(DESC,  "TPR Channel $(N) Trigger Delay")
+  field(EGU,   "us")
+  field(FLNK,  "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
+}
+
+field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
+{
+  field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
+  field(INPB, "$(RATE)")
+  field(CALC, "1000 * A / B")
+  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS PP")
+  field(FLNK, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT")
+}
+
+field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT")
+{
+  field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
+  field(INPB, "$(RATE)")
+  field(INPC, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS")
+  field(CALC, "(1000 * A - C * B) * 12.16"                   # 12.16 = 1000ps/ns / 82.24ps step.
+  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_FINE_DELAY PP")  # The write will handle the 31,32 weirdness.
+}
+
+record(longout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS")
 {
   field(DESC,  "TPR Channel $(N) Trigger Delay")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) TRGDEL")
+  field(OUT,  "@$(CARD) $(L) $(N) TRGDEL")
   field(OMSL,  "supervisory")
 }
 
-record(longout, "$(BASE):CH$(N):TRIG_FINE_DELAY")
+record(longout, "$(BASE):LCLS$(L):CH$(N):TRIG_FINE_DELAY")
 {
   field(DESC,  "TPR Channel $(N) Trigger Fine Delay")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) TRGFDEL")
+  field(OUT,  "@$(CARD) $(L) $(N) TRGFDEL")
   field(OMSL,  "supervisory")
 }
 
-record(longin, "$(BASE):CH$(N):CHANGE")
+record(longin, "$(BASE):LCLS$(L):CH$(N):CHANGE")
 {
-  field(DESC,  "TPR Channel $(N) Trigger Fine Delay")
+  field(DESC,  "TPR Channel $(N) Parameter Change")
   field(DTYP, "TPR Master")
-  field(OUT,  "#$(CARD) $(N) TRGFDEL")
+  field(INP,  "@$(CARD) $(L) $(N) CHANGE")
+  field(SCAN, "I/O Intr")
   field(OMSL,  "supervisory")
 }

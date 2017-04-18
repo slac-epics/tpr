@@ -1,22 +1,34 @@
-file tpr_config.db
+file tpr_config.template
 {
-pattern {  BASE   }
-        { $(BASE) }
+pattern {  IOC    }
+        { $(IOC) }
 }
 
-file tpr_ch_config.db
+file tpr_ch_config.template
 {
-pattern {  BASE,  N }
-        { $(BASE) 0 },
-        { $(BASE) 1 },
-        { $(BASE) 2 },
-        { $(BASE) 3 },
-        { $(BASE) 4 },
-        { $(BASE) 5 },
-        { $(BASE) 6 },
-        { $(BASE) 7 },
-        { $(BASE) 8 },
-        { $(BASE) 9 },
-        { $(BASE) A },
-        { $(BASE) B }
+pattern { N, L,     RATE,      FSTAT,     ASTAT }
+        { 0, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 1, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 2, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 3, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 4, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 5, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 6, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 7, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 8, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 9, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { A, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { B, 1, 8.403361345, "INVALID", "NO_ALARM" },
+        { 0, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 1, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 2, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 3, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 4, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 5, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 6, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 7, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 8, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { 9, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { A, 2, 5.385029618, "NO_ALARM", "INVALID" },
+        { B, 2, 5.385029618, "NO_ALARM", "INVALID" }
 }

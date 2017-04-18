@@ -25,4 +25,4 @@ DB += tpr_master.db
 # Nothing to build for autosave, just install from $AUTOSAVE/db
 #DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db
 
-include $(TOP)/configure/RULES_DIRS
+include $(TOP)/configure/RULES

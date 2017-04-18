@@ -8,10 +8,10 @@ include $(TOP)/configure/CONFIG
 
 # INC+=evrTime.h
 # DBDINC += longSubRecord
-# DBD += evrSupport.dbd
-# LIBRARY_IOC = evrSupport
-#evrSupport_SRCS += evrEvInvariantDelay.c
-# evrSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+DBD += drvTpr.dbd
+LIBRARY_IOC = tpr
+tpr_SRCS += devTpr.c drvTpr.c
+tpr_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #===========================
 
