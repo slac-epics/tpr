@@ -89,7 +89,7 @@ record(mbbo, "$(BASE):LCLS$(L):CH$(N):DEST")
   field(OMSL, "supervisory")
 }
 
-record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):DEST_MODE")
+record(mbbo, "$(BASE):LCLS$(L):CH$(N):DEST_MODE")
 {
   field(DESC, "TPR Channel $(N) Dest Mode")
   field(DTYP, "TPR Master")
@@ -125,7 +125,7 @@ record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):DEST_MODE")
   field(FTSV, "INVALID")
   field(FFST, "ERROR")
   field(FFSV, "INVALID")
-  field(FFSV, "ERROR")
+  field(FFST, "ERROR")
   field(UNSV, "INVALID")
 }
 
@@ -153,7 +153,7 @@ record(ao, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT")
 }
 
-field(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT")
+record(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY")
   field(INPB, "$(RATE)")
@@ -176,7 +176,7 @@ record(ao, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT")
 }
 
-field(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT")
+record(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH")
   field(INPB, "$(RATE)")
@@ -210,7 +210,7 @@ record(ao, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT")
 }
 
-field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT")
+record(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH")
   field(INPB, "$(RATE)")
@@ -233,7 +233,7 @@ record(ao, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
 }
 
-field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
+record(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
   field(INPB, "$(RATE)")
@@ -242,12 +242,12 @@ field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
   field(FLNK, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT")
 }
 
-field(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT")
+record(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
   field(INPB, "$(RATE)")
   field(INPC, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS")
-  field(CALC, "(1000 * A - C * B) * 12.16"                   # 12.16 = 1000ps/ns / 82.24ps step.
+  field(CALC, "(1000 * A - C * B) * 12.16")                  # 12.16 = 1000ps/ns / 82.24ps step.
   field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_FINE_DELAY PP")  # The write will handle the 31,32 weirdness.
 }
 
@@ -273,5 +273,4 @@ record(longin, "$(BASE):LCLS$(L):CH$(N):CHANGE")
   field(DTYP, "TPR Master")
   field(INP,  "@$(CARD) $(L) $(N) CHANGE")
   field(SCAN, "I/O Intr")
-  field(OMSL,  "supervisory")
 }

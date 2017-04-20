@@ -79,7 +79,7 @@ static int initorder[] = {
     TRGDEL,
     TRGWID,
     TRGFDEL,
-    BSAEN,
+    BSAEN,          // Put the enables last!!!
     ENABLE,
     TRIGEN,
     -1
@@ -87,12 +87,23 @@ static int initorder[] = {
 
 static struct lookup *do_lookup(DBLINK *l, int *card, int *lcls, int *chan)
 {
-    char buf[64];
+    char buf[64], c;
     int i;
-    if (sscanf(l->value.instio.string, "%d %d %d %s", card, lcls, chan, buf) != 4) {
+    if (sscanf(l->value.instio.string, "%d %d %c %s", card, lcls, &c, buf) != 4) {
         fprintf(stderr, "Illegal link format: %s\n", l->value.instio.string);
         return NULL;
     }
+    if (c >= '0' && c <= '9')
+        *chan = c - '0';
+    else if (c >= 'A' && c <= 'B')
+        *chan = c - 'A' + 10;
+    else if (c == '-')
+        *chan = -1;
+    else {
+        fprintf(stderr, "Illegal channel: %c (%s)\n", c, l->value.instio.string);
+        return NULL;
+    }
+    (*lcls)--;
     for (i = 0; fieldnames[i].name != NULL; i++) {
         if (!strcmp(fieldnames[i].name, buf))
             return &fieldnames[i];
@@ -111,7 +122,7 @@ static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int lcls, int chan, int
     return p;
 }
 
-u32 tprGetConfig(tprCardStruct *pCard, int chan, int reg)
+int tprGetConfig(tprCardStruct *pCard, int chan, int reg)
 {
     switch (reg & 0xffffff00) {
     case 0x000:
@@ -135,13 +146,16 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
 {
     switch (reg) {
     case CRESET:
+        WDEBUG(pCard->r->countReset, 1);
         pCard->r->countReset = 1;
         pCard->config.global.boRecord[CRESET]->val = 0;
         // Monitor?  Or RVAL?
         return 0;
     case XBAR:
-        pCard->r->xbarOut[0] = value ? 0 : 1;
-        pCard->r->xbarOut[1] = value ? 1 : 0;
+        WDEBUG(pCard->r->xbarOut[2], value ? 0 : 1);
+        WDEBUG(pCard->r->xbarOut[3], value ? 1 : 0);
+        pCard->r->xbarOut[2] = value ? 0 : 1;
+        pCard->r->xbarOut[3] = value ? 1 : 0;
         return 0;
     case MODE: {
         /* The big one: we're switching modes! */
@@ -152,6 +166,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         for (i = 0; i < 12; i++)         /* Everything off. */
             pCard->r->channel[i].control = 0;
         pCard->config.mode = value;      /* Switch modes */
+        WDEBUG(pCard->r->trigMaster, value);
         pCard->r->trigMaster = value;
         for (i = 0; i < 12; i++) {       /* Tell everything there has been a change. */
             dbProcess((dbCommon *)pCard->config.lcls[0][i].longinRecord[0]);
@@ -165,27 +180,35 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
     }
     case ENABLE:
         if (value)
-            pCard->r->channel[chan].control |= 5;
+            value = pCard->r->channel[chan].control | 5;
         else
-            pCard->r->channel[chan].control &= ~5;
+            value = pCard->r->channel[chan].control & ~5;
+        WDEBUG(pCard->r->channel[chan].control, value);
+        pCard->r->channel[chan].control = value;
         return 1;
     case BSAEN:
         if (value)
-            pCard->r->channel[chan].control |= 2;
+            value = pCard->r->channel[chan].control | 2;
         else
-            pCard->r->channel[chan].control &= ~2;
+            value = pCard->r->channel[chan].control & ~2;
+        WDEBUG(pCard->r->channel[chan].control, value);
+        pCard->r->channel[chan].control = value;
         return 0;
     case TRIGEN:
         if (value)
-            pCard->r->trigger[chan].control |= 0x80000000;
+            value = pCard->r->trigger[chan].control | 0x80000000;
         else
-            pCard->r->trigger[chan].control &= 0x7fffffff;
+            value = pCard->r->trigger[chan].control & 0x7fffffff;
+        WDEBUG(pCard->r->trigger[chan].control, value);
+        pCard->r->trigger[chan].control = value;
         return 1;
     case POL:
         if (value)
-            pCard->r->trigger[chan].control |= 0x00010000;
+            value = pCard->r->trigger[chan].control | 0x00010000;
         else
-            pCard->r->trigger[chan].control &= 0xfffeffff;
+            value = pCard->r->trigger[chan].control & 0xfffeffff;
+        WDEBUG(pCard->r->trigger[chan].control, value);
+        pCard->r->trigger[chan].control = value;
         return 1;
     case EVENT: {
         u32 eventSelect = pCard->r->channel[chan].eventSelect;
@@ -196,18 +219,21 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         } else if (value == 13) {  // Sequence
             eventSelect = ES_DESTSELECT(eventSelect) | ES_SEQ(tprGetConfig(pCard, chan, SEQ));
         }
+        WDEBUG(pCard->r->channel[chan].eventSelect, eventSelect);
         pCard->r->channel[chan].eventSelect = eventSelect;
         return 1;
     }
     case DMASK: {
         u32 eventSelect = pCard->r->channel[chan].eventSelect;
         eventSelect = ES_RATESELECT(eventSelect) | ES_DMODESELECT(eventSelect) | ES_DMASK(value);
+        WDEBUG(pCard->r->channel[chan].eventSelect, eventSelect);
         pCard->r->channel[chan].eventSelect = eventSelect;
         return 1;
     }
     case DMODE: {
         u32 eventSelect = pCard->r->channel[chan].eventSelect;
         eventSelect = ES_RATESELECT(eventSelect) | ES_DMODE(value) | ES_DMASKSELECT(eventSelect);
+        WDEBUG(pCard->r->channel[chan].eventSelect, eventSelect);
         pCard->r->channel[chan].eventSelect = eventSelect;
         return 1;
     }
@@ -216,6 +242,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         if (ES_TYPESELECT(eventSelect) != ES_TYPE_AC)
             return 0;
         eventSelect = ES_DESTSELECT(eventSelect) | ES_ACSELECT(eventSelect) | ES_TS(value);
+        WDEBUG(pCard->r->channel[chan].eventSelect, eventSelect);
         pCard->r->channel[chan].eventSelect = eventSelect;
         return 1;
     }
@@ -224,27 +251,35 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         if (ES_TYPESELECT(eventSelect) != ES_TYPE_SEQ)
             return 0;
         eventSelect = ES_DESTSELECT(eventSelect) | ES_SEQ(value);
+        WDEBUG(pCard->r->channel[chan].eventSelect, eventSelect);
         pCard->r->channel[chan].eventSelect = eventSelect;
         return 1;
     }
     case BSADEL:
-        if (value < 0)
+        if (value < 0) {
+            WDEBUG(pCard->r->channel[chan].bsadelay, ES_BSANEG(value));
             pCard->r->channel[chan].bsadelay = ES_BSANEG(value);
-        else
+        } else {
+            WDEBUG(pCard->r->channel[chan].bsadelay, ES_BSAPOS(value));
             pCard->r->channel[chan].bsadelay = ES_BSAPOS(value);
+        }
         return 0;
     case BSAWID:
+        WDEBUG(pCard->r->channel[chan].bsawidth, value);
         pCard->r->channel[chan].bsawidth = value;
         return 0;
     case TRGDEL:
+        WDEBUG(pCard->r->trigger[chan].delay, value);
         pCard->r->trigger[chan].delay = value;
         return 1;
     case TRGWID:
+        WDEBUG(pCard->r->trigger[chan].width, value);
         pCard->r->trigger[chan].width = value;
         return 1;
     case TRGFDEL:
         if (pCard->config.mode == 0) /* Not for LCLS-I! */
             return 0;
+        WDEBUG(pCard->r->trigger[chan].delayTap, value);
         pCard->r->trigger[chan].delayTap = value;
         return 1;
     }
@@ -310,8 +345,7 @@ epicsStatus tprIointlonginRecord(int cmd, longinRecord *pRec, IOSCANPVT *iopvt)
 {
     struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
     tprCardStruct *pCard = dpvt->pCard;
-    int mode = pCard->config.mode;
-    *iopvt = pCard->config.lcls[mode][dpvt->chan].ioscan;
+    *iopvt = pCard->config.lcls[dpvt->lcls][dpvt->chan].ioscan;
     return 0;
 }
 
@@ -322,9 +356,9 @@ epicsStatus tprProclonginRecord(longinRecord *pRec)
     return 0;
 }
 
-static dsetStruct devTprlongin = {
+static dsetStruct devTprlonginRecord = {
     5, (DEVSUPFUN)NULL, (DEVSUPFUN)NULL, (DEVSUPFUN)tprInitlonginRecord,
     (DEVSUPFUN)tprIointlonginRecord, (DEVSUPFUN)tprProclonginRecord
 };
 
-epicsExportAddress (dset, devTprlongin);
+epicsExportAddress (dset, devTprlonginRecord);

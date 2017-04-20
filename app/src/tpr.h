@@ -50,7 +50,7 @@ typedef struct TprReg {
   __u32 reserved_0[0x10000>>2];
   __u32 FpgaVersion;
   __u32 reserved_04[(0x30000>>2)-1];
-  __u32 xbarOut[4]; // 0x30000
+  __u32 xbarOut[4]; // 0x40000
   __u32 reserved_30010[(0x40000>>2)-4];
   __u32 irqControl; // 0x80000
   __u32 irqStatus;

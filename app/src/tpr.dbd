@@ -1,0 +1,6 @@
+registrar(drvTprRegister)
+device (bo, INST_IO, devTprboRecord, "TPR Master")
+device (mbbo, INST_IO, devTprmbboRecord, "TPR Master")
+device (mbboDirect, INST_IO, devTprmbboDirectRecord, "TPR Master")
+device (longout, INST_IO, devTprlongoutRecord, "TPR Master")
+device (longin, INST_IO, devTprlonginRecord, "TPR Master")

@@ -8,7 +8,7 @@ include $(TOP)/configure/CONFIG
 
 # INC+=evrTime.h
 # DBDINC += longSubRecord
-DBD += drvTpr.dbd
+DBD += tpr.dbd
 LIBRARY_IOC = tpr
 tpr_SRCS += devTpr.c drvTpr.c
 tpr_LIBS += $(EPICS_BASE_IOC_LIBS)

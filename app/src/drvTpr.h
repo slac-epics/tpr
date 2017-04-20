@@ -18,11 +18,11 @@ struct tprChannelConfig {
 #define BSAEN   ((1<<8)|1)
 #define TRIGEN  ((1<<8)|2)
 #define POL     ((1<<8)|3)
-    struct mbboRecord *mbboRecord[2];
+    struct mbboRecord *mbboRecord[3];
 #define EVENT   ((2<<8)|0)
 #define DMASK   ((2<<8)|1)
-    struct mbboDirectRecord *mbboDirectRecord[2];
-#define DMODE   ((3<<8)|0)
+#define DMODE   ((2<<8)|2)
+    struct mbboDirectRecord *mbboDirectRecord[1];
 #define TSMASK  ((3<<8)|1)
     struct longoutRecord *longoutRecord[6];
 #define SEQ     ((4<<8)|0)
@@ -55,3 +55,8 @@ typedef struct tprCardStruct {
 
 extern tprCardStruct *tprGetCard(int card);
 extern int tprWrite(tprCardStruct *pCard, int reg, int chan, int value);
+extern int tprGetConfig(tprCardStruct *pCard, int chan, int reg);
+extern int tprDebug;
+
+#define WDEBUG(lhs, rhs) if (tprDebug & TPR_DEBUG_WRITE) printf("WRITE %d (0x%x) --> 0x%x\n", (rhs), (rhs), (u32)((char *)&(lhs) - (char *)pCard->r))
+#define TPR_DEBUG_WRITE     1

@@ -70,6 +70,8 @@ tprCardStruct *tprGetCard(int card)
          pCard = (tprCardStruct *)ellNext(&pCard->link)) {
         if (pCard->card == card) {
             epicsMutexUnlock(cardListLock);
+            if (pCard->config.mode != -1)
+                printf("mode = %d?\n", pCard->config.mode);
             return pCard;
         }
     }
@@ -134,6 +136,7 @@ static void TprConfigure(int card, int minor)
         for (i = 0; i < 12; i++) {
             scanIoInit(&pCard->config.lcls[0][i].ioscan);
             scanIoInit(&pCard->config.lcls[1][i].ioscan);
+            pCard->fd[i] = -1;
         }
     }
     pCard->mmask |= 1 << minor;
@@ -207,6 +210,17 @@ static void TprDrvReportCall(const iocshArgBuf *args)
     TprDrvReport(args[0].ival);
 }
 
+/* iocsh command: TprStart */
+static const iocshArg TprStartArg0 = {"Card" , iocshArgInt};
+static const iocshArg *const TprStartArgs[1] = {&TprStartArg0};
+static const iocshFuncDef TprStartDef = {"TprStart", 1, TprStartArgs};
+
+static void TprStartCall(const iocshArgBuf *args)
+{
+    tprCardStruct *pCard = tprGetCard(args[0].ival);
+    tprWrite(pCard, MODE, -1, tprGetConfig(pCard, -1, MODE));
+}
+
 /* Registration APIs */
 static void drvTprRegister()
 {
@@ -215,5 +229,7 @@ static void drvTprRegister()
     iocshRegister(&TprConfigureDef, TprConfigureCall );
     iocshRegister(&TprDebugLevelDef, TprDebugLevelCall );
     iocshRegister(&TprDrvReportDef, TprDrvReportCall );
+    iocshRegister(&TprStartDef, TprStartCall );
 }
 epicsExportRegistrar(drvTprRegister);
+

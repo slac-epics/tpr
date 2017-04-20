@@ -1,6 +1,0 @@
-registrar(drvTprRegister)
-device (bo, INST_IO, devTprBo, "TPR Master")
-device (mbbo, INST_IO, devTprMbbo, "TPR Master")
-device (mbboDirect, INST_IO, devTprMbboDirect, "TPR Master")
-device (longout, INST_IO, devTprLongout, "TPR Master")
-device (longin, INST_IO, devTprLongin, "TPR Master")

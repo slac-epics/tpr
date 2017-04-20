@@ -15,12 +15,12 @@ DB += tpr_master.db
 #----------------------------------------------------
 # Create and install (or just install)
 # Autosave request files, templates, substitutions like this
-# REQ += autosave_ipimb.req
+REQ += autosave_tpr.req
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Archive files, templates, substitutions like this
-# ARCHIVE += archive_ipimb.tpl-arch
+ARCHIVE += archive_tpr.archive
 
 # Nothing to build for autosave, just install from $AUTOSAVE/db
 #DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db
