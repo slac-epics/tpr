@@ -163,8 +163,10 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
 
         if (value == pCard->config.mode) /* Wishful thinking! */
             return 0;
-        for (i = 0; i < 12; i++)         /* Everything off. */
+        for (i = 0; i < 12; i++) {       /* Everything off. */
+            WDEBUG(pCard->r->channel[i].control, 0);
             pCard->r->channel[i].control = 0;
+        }
         pCard->config.mode = value;      /* Switch modes */
         WDEBUG(pCard->r->trigMaster, value);
         pCard->r->trigMaster = value;
