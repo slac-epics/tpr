@@ -10,7 +10,7 @@ include $(TOP)/configure/CONFIG
 # DBDINC += longSubRecord
 DBD += tpr.dbd
 LIBRARY_IOC = tpr
-tpr_SRCS += devTpr.c drvTpr.c
+tpr_SRCS += devTpr.c drvTpr.c tprProcess.c
 tpr_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #===========================

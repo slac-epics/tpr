@@ -1,0 +1,76 @@
+#
+# Records for listening to a single TPR channel.
+# Macros: BASE - Base PV
+#         CARD - TPR card number
+#         N    - Channel number
+#         EVT  - EPICS event number
+#	  TPR  - TPR base PV
+
+record(longout, "$(BASE):CH$(N):EVENTNUM")
+{
+  field(DESC, "TPR Channel $(N) EPICS Event")
+  field(DTYP, "TPR Client")
+  field(OUT,  "@$(CARD) $(N) ENUM")
+  field(PINI, "YES")
+  field(OMSL, "supervisory")
+  field(VAL,  "$(EVT)")
+}
+
+record(event, "$(BASE):CH$(N):EVENT" )
+{
+  field(DESC,  "TPR Channel $(N) Event")
+  field(DTYP,  "TPR Client" )
+  field(INP,   "@$(CARD) $(N) EVT")
+  field(PRIO,  "HIGH" )
+  field(SCAN,  "I/O Intr" )
+  field(TSE,   "-2")
+  field(FLNK,  "$(BASE):CH$(N):MESSAGE")
+}
+
+record(waveform, "$(BASE):CH$(N):MESSAGE")
+{
+  field(DESC,  "TPR Channel $(N) Timing Message")
+  field(DTYP,  "TPR Client" )
+  field(FTVL,  "ULONG" )
+  field(NELM,  "21")
+  field(INP,   "@$(CARD) $(N) MESSAGE")
+  field(TSE,   "-2")
+  field(FLNK,  "$(BASE):CH$(N):PIDL")
+}
+
+record(longin, "$(BASE):CH$(N):PIDL")
+{
+  field(DESC,  "TPR Channel $(N) Pulse ID (L)")
+  field(DTYP,  "TPR Client" )
+  field(INP,   "@$(CARD) $(N) PIDL")
+  field(TSE,   "-2")
+  field(FLNK,  "$(BASE):CH$(N):PIDH")
+}
+
+record(longin, "$(BASE):CH$(N):PIDH")
+{
+  field(DESC,  "TPR Channel $(N) Pulse ID (H)")
+  field(DTYP,  "TPR Client" )
+  field(INP,   "@$(CARD) $(N) PIDH")
+  field(TSE,   "-2")
+  field(FLNK,  "$(BASE):CH$(N):TIMING_MODE")
+}
+
+record(bi, "$(BASE):CH$(N):TIMING_MODE")
+{
+  field(DESC,  "TPR Channel $(N) Timing Mode")
+  field(DTYP,  "TPR Client" )
+  field(INP,   "@$(CARD) $(N) TMODE")
+  field(TSE,   "-2")
+  field(ZNAM, "LCLS-I")
+  field(ONAM, "LCLS-II")
+}
+
+record(calc, "$(BASE):CH$(N):CHANGE")
+{
+  field(DESC,  "TPR Channel $(N) Change")
+  field(INPA,  "$(TPR):LCLS1:CH$(N):CHANGE CPP")
+  field(INPB,  "$(TPR):LCLS2:CH$(N):CHANGE CPP")
+  field(INPC,  "$(TPR):TIMING_MODE CPP")
+  field(CALC,  "C?B:A")
+}

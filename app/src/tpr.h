@@ -71,7 +71,7 @@ typedef struct TprReg {
 #define ES_TYPE_AC    (1 << 11)
 #define ES_TYPE_SEQ   (2 << 11)
 #define ES_FIXED(r)   (ES_TYPE_FIXED | ((r) & 0xf))
-#define ES_TS(ts)     (((ts) & 0x2f) << 3)
+#define ES_TS(ts)     (((ts) & 0x3f) << 3)
 #define ES_AC(r, ts)  (ES_TYPE_AC | ((r) & 0x7) | ES_TS(ts))
 #define ES_SEQ(s)     (ES_TYPE_SEQ | ((s) & 0x7ff))
 #define ES_DMODE(m)   (((m) & 0x3) << 29)
@@ -83,7 +83,9 @@ typedef struct TprReg {
     __u32 bsawidth;
     __u32 reserved[3];
   } channel[12];
-  __u32 reserved_1a0[24];
+  __u32 reserved_1a0[2];
+  __u32 frameCount;
+  __u32 reserved_1ac[21];
   struct TrReg {    // 0x80200
     __u32 control;
     __u32 delay;
@@ -99,4 +101,76 @@ typedef struct TprReg {
   __u32 rxFifoSize;       // RW 0x504 Buffers per FIFO
   __u32 rxCount ;         // RO 0x508 (rxCount)
   __u32 lastDesc;         // RO 0x50C (lastDesc)
+  __u32 reserved_80510[65212];
+  __u32 sofcnt;
+  __u32 eofcnt;
+  __u32 reserved_c0000[6];
+  __u32 CSR;
+  __u32 msgDelay;
 } tprReg;
+
+typedef struct tprHeader {
+    uint16_t chmask;
+    uint8_t  tag;
+#define TAG_DROP      0x80
+#define TAG_LCLS1     0x40
+#define TAG_TYPE_MASK 0xf
+#define TAG_EVENT     0
+#define TAG_BSA_CTRL  1
+#define TAG_BSA_EVENT 2
+#define TAG_END       15
+    uint8_t  dma_ownership;
+#define DMAOWN_NEW    0x80
+#define DMAOWN_DROP   0x40
+} __attribute__((packed)) tprHeader;
+
+typedef struct tprEvent {
+    struct tprHeader header;
+    uint32_t         length;
+    uint64_t         pulseID;
+    uint32_t         nanosecs;
+    uint32_t         seconds;
+    uint16_t         rates;
+#define RATE_AC_60Hz       0x8000
+#define RATE_AC_30Hz       0x4000
+#define RATE_AC_10Hz       0x2000
+#define RATE_AC_5Hz        0x1000
+#define RATE_AC_1Hz        0x0800
+#define RATE_AC_HALFHz     0x0400
+#define RATE_FIXED_929kHz  0x0040
+#define RATE_FIXED_71kHz   0x0020
+#define RATE_FIXED_10kHz   0x0010
+#define RATE_FIXED_1kHz    0x0008
+#define RATE_FIXED_100Hz   0x0004
+#define RATE_FIXED_10Hz    0x0002
+#define RATE_FIXED_1Hz     0x0001
+    uint16_t         timeslot;
+#define TS_71kHZ_RESYNC    0x8000
+#define TS_CLK_TS_CHG_MASK 0x07ff
+#define TS_CLK_TS_CHG_OFF  3
+#define TS_ACMASK          7
+    uint32_t         beamreq;
+    uint16_t         beamenergy[4];
+    uint16_t         calib_ctrl;
+    uint16_t         mps_limit;
+    uint64_t         mps_class;
+    uint32_t         seq[9];
+} __attribute__((packed)) tprEvent;
+
+typedef struct tprBSAControl {
+    struct tprHeader header;
+    uint32_t         seconds;
+    uint32_t         nanosecs;
+    uint64_t         init;
+    uint64_t         major;
+    uint64_t         minor;
+    uint64_t         update;
+} __attribute__((packed)) tprBSAControl;
+
+typedef struct tprBSAEvent {
+    struct tprHeader header;
+    uint64_t         activePID;
+    uint64_t         active;
+    uint64_t         avgdonePID;
+    uint64_t         avgdone;
+} __attribute__((packed)) tprBSAEvent;

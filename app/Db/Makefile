@@ -11,6 +11,7 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install)
 # databases, templates, substitutions like this
 DB += tpr_master.db
+DB += tpr_client.db
 
 #----------------------------------------------------
 # Create and install (or just install)

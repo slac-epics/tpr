@@ -6,7 +6,6 @@
 #         L     - LCLS1/LCLS2 indicator
 #         RATE  - Tick frequency
 #         FSTAT - Fixed rate alarm status.
-#         ASTAT - AC 0.5 Hz alarm status.
 #
 record(bo, "$(BASE):LCLS$(L):CH$(N):ENABLE")
 {
@@ -50,7 +49,7 @@ record(mbbo, "$(BASE):LCLS$(L):CH$(N):EVENT_SELECT")
   field(OMSL, "supervisory")
   field(ZRST, "Fixed 929 kHz")
   field(ZRSV, "MAJOR")
-  field(ONST, "71.Fixed 5 kHz")
+  field(ONST, "Fixed 71.5 kHz")
   field(ONSV, "MAJOR")
   field(TWST, "Fixed 10 kHz")
   field(TWSV, "MAJOR")
@@ -67,8 +66,7 @@ record(mbbo, "$(BASE):LCLS$(L):CH$(N):EVENT_SELECT")
   field(NIST, "AC: 10 Hz")
   field(TEST, "AC: 5 Hz")
   field(ELST, "AC: 1 Hz")
-  field(TWST, "0.AC: 5 Hz")
-  field(TWSV, "$(ASTAT)")
+  field(TVST, "AC: 0.5 Hz")
   field(TTST, "Sequence")
   field(FTST, "ERROR")
   field(FTSV, "INVALID")
@@ -98,7 +96,7 @@ record(mbbo, "$(BASE):LCLS$(L):CH$(N):DEST_MODE")
   field(OMSL, "supervisory")
   field(ZRST, "Inclusive")
   field(ONST, "Exclusive")
-  field(TWST, "Do not Care")
+  field(TWST, "Do Not Care")
   field(THST, "ERROR")
   field(THSV, "INVALID")
   field(FRST, "ERROR")
@@ -273,4 +271,52 @@ record(longin, "$(BASE):LCLS$(L):CH$(N):CHANGE")
   field(DTYP, "TPR Master")
   field(INP,  "@$(CARD) $(L) $(N) CHANGE")
   field(SCAN, "I/O Intr")
+}
+
+record(calcout, "$(BASE):LCLS$(L):CH$(N):HALFHZ")
+{
+  field(INPA, "$(BASE):LCLS$(L):CH$(N):HALFHZ NPP NMS")
+  field(CALC, "A?0:1")
+  field(OOPT, "Transition To Zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "1")
+  field(SCAN, "1 second")
+  field(OUT, "$(BASE):LCLS$(L):CH$(N):COUNT.PROC")
+}
+
+record(longin, "$(BASE):LCLS$(L):CH$(N):COUNT")
+{
+  field(DESC,  "TPR Channel $(N) Frame Count")
+  field(DTYP, "TPR Master")
+  field(INP,  "@$(CARD) $(L) $(N) COUNT")
+  field(FLNK,  "$(BASE):LCLS$(L):CH$(N):RATECALC")
+}
+
+record(aSub, "$(BASE):LCLS$(L):CH$(N):RATECALC")
+{
+  field(DESC,  "TPR Channel $(N) Event Rate")
+  field(INAM,  "tprRateInit")
+  field(SNAM,  "tprRateProc")
+  field(SCAN,  "Passive")
+  field(INPA,  "$(L)")
+  field(FTA,   "LONG")
+  field(INPB,  "$(N)")
+  field(FTB,   "LONG")
+  field(INPC,  "$(CARD)")
+  field(FTC,   "LONG")
+  field(FTVA,  "LONG")    # count
+  field(FTVB,  "LONG")    # last count
+  field(FTVC,  "LONG")    # frame count
+  field(FTVD,  "LONG")    # last frame count
+  field(FTVE,  "DOUBLE")  # the rate!
+  field(FTVF,  "DOUBLE")  # card structure
+  field(OUTE,  "$(BASE):LCLS$(L):CH$(N):RATE PP NMS")
+}
+
+record(ai, "$(BASE):LCLS$(L):CH$(N):RATE")
+{
+  field(DESC,  "TPR Channel $(N) Event Rate")
+  field(EGU,   "Hz")
+  field(PREC,  "2")
+  field(VAL,   "0")
 }

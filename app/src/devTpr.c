@@ -25,15 +25,6 @@
 #include <longoutRecord.h>
 #include "drvTpr.h"
 
-typedef struct dsetStruct {
-        long            number;
-        DEVSUPFUN       report;
-        DEVSUPFUN       init;
-        DEVSUPFUN       initRec;
-        DEVSUPFUN       get_ioint_info;
-        DEVSUPFUN       proc;
-} dsetStruct;
-
 struct dpvtStruct {
     tprCardStruct *pCard;
     int            lcls;
@@ -64,6 +55,7 @@ static struct lookup {
     {"TRGWID",  TRGWID, 0},
     {"TRGFDEL", TRGFDEL, 0},
     {"CHANGE",  CHANGE, 0},
+    {"COUNT",   COUNT, 0},
     {NULL,      -1, 0}
 };
 
@@ -159,7 +151,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         return 0;
     case MODE: {
         /* The big one: we're switching modes! */
-        int i, j;
+        int i, j, csr;
 
         if (value == pCard->config.mode) /* Wishful thinking! */
             return 0;
@@ -168,8 +160,13 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
             pCard->r->channel[i].control = 0;
         }
         pCard->config.mode = value;      /* Switch modes */
-        WDEBUG(pCard->r->trigMaster, value);
-        pCard->r->trigMaster = value;
+        csr = pCard->r->CSR;
+        if (value)
+            csr |= 0x10;
+        else
+            csr &= ~0x10;
+        WDEBUG(pCard->r->CSR, csr);
+        pCard->r->CSR = csr;
         for (i = 0; i < 12; i++) {       /* Tell everything there has been a change. */
             dbProcess((dbCommon *)pCard->config.lcls[0][i].longinRecord[0]);
             dbProcess((dbCommon *)pCard->config.lcls[1][i].longinRecord[0]);
@@ -307,13 +304,21 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         return 0;                                                             \
     }
 
+/*
+ * Logic here:
+ *    dpvt->lcls == -2                 --> always write!
+ *    pCard->config.mode == -1         --> We aren't initialized, don't write 
+ *                                         anything except the "always write" values.
+ *    dpvt->lcls >= 0                  --> Not universal (LCLS-I or LCLS-II, not both).
+ *    dpvt->lcls != pCard->config.mode --> This is for the "other" set of values.
+ */
 #define PROCDECL(TYPE)                                                        \
     static epicsStatus tprProc##TYPE(TYPE *pRec)                              \
     {                                                                         \
         struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;            \
         tprCardStruct *pCard = dpvt->pCard;                                   \
         int mode = pCard->config.mode;                                        \
-        if (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))              \
+        if ((dpvt->lcls != -2) && (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))) \
             return 0;                                                         \
         if (tprWrite(pCard, dpvt->idx, dpvt->chan, pRec->val))                \
             scanIoRequest(pCard->config.lcls[mode][dpvt->chan].ioscan);       \
@@ -343,7 +348,7 @@ DSETDECL(mbboRecord)
 DSETDECL(mbboDirectRecord)
 DSETDECL(longoutRecord)
 
-epicsStatus tprIointlonginRecord(int cmd, longinRecord *pRec, IOSCANPVT *iopvt)
+static epicsStatus tprIointlonginRecord(int cmd, longinRecord *pRec, IOSCANPVT *iopvt)
 {
     struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
     tprCardStruct *pCard = dpvt->pCard;
@@ -351,10 +356,21 @@ epicsStatus tprIointlonginRecord(int cmd, longinRecord *pRec, IOSCANPVT *iopvt)
     return 0;
 }
 
-epicsStatus tprProclonginRecord(longinRecord *pRec)
+static epicsStatus tprProclonginRecord(longinRecord *pRec)
 {
-    pRec->val++;
-    pRec->udf = 0;
+    struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
+    tprCardStruct *pCard = dpvt->pCard;
+    int mode = pCard->config.mode;
+    if (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))
+            return 0;
+    switch (dpvt->idx) {
+    case CHANGE:
+        pRec->val++;
+        break;
+    case COUNT:
+        pRec->val = pCard->r->channel[dpvt->chan].eventCount;
+        break;
+    }
     return 0;
 }
 
