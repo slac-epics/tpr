@@ -149,28 +149,37 @@ typedef struct tprEvent {
 #define TS_CLK_TS_CHG_MASK 0x07ff
 #define TS_CLK_TS_CHG_OFF  3
 #define TS_ACMASK          7
-    uint32_t         beamreq;
-    uint16_t         beamenergy[4];
-    uint16_t         calib_ctrl;
-    uint16_t         mps_limit;
-    uint64_t         mps_class;
-    uint32_t         seq[9];
+    uint32_t         beamreq;                 // 28
+    union {
+        struct {
+            uint32_t         mod[6];                  // 32
+        } l1;
+        struct {
+            uint16_t         beamenergy[4];           // 32
+            uint32_t         photon_wavelen;          // 40
+            uint16_t         status;                  // 44
+            uint16_t         mps_limit;               // 46
+            uint64_t         mps_class;               // 48
+        } l2;
+    } misc;
+    uint32_t         seq[9];                  // 56, last reserved for lcls1!
 } __attribute__((packed)) tprEvent;
 
 typedef struct tprBSAControl {
     struct tprHeader header;
-    uint32_t         seconds;
     uint32_t         nanosecs;
+    uint32_t         seconds;
     uint64_t         init;
     uint64_t         major;
     uint64_t         minor;
-    uint64_t         update;
 } __attribute__((packed)) tprBSAControl;
 
 typedef struct tprBSAEvent {
     struct tprHeader header;
-    uint64_t         activePID;
+    uint64_t         PID;
     uint64_t         active;
-    uint64_t         avgdonePID;
     uint64_t         avgdone;
+    uint32_t         nanosecs;
+    uint32_t         seconds;
+    uint64_t         update;
 } __attribute__((packed)) tprBSAEvent;

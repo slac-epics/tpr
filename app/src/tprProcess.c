@@ -251,12 +251,25 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
     }
     case TAG_BSA_CTRL: {
         tprBSAControl *bc = (tprBSAControl *)message;
-        printf("BSActrl %p\n", bc);
+        int i;
+        printf("BSActrl %d.%09d: init=%llx\n", bc->seconds, bc->nanosecs, (long long unsigned int)bc->init);
+        printf("\t%ld: ", sizeof(tprBSAControl));
+        for (i = 0; i < sizeof(tprBSAControl); i++)
+            printf("%02x", ((unsigned char *)message)[i]);
+        printf("\n");
         break;
     }
     case TAG_BSA_EVENT: {
         tprBSAEvent *be = (tprBSAEvent *)message;
-        printf("BSAevent %p\n", be);
+        int i;
+        printf("BSAevent active=%llx, avgdone=%llx, update=%llx, pid=%llx, ts=%d.%09d\n",
+                   (long long unsigned int)be->active, (long long unsigned int)be->avgdone,
+                   (long long unsigned int)be->update, (long long unsigned int)be->PID,
+                   be->seconds, be->nanosecs);
+        printf("\t%ld: ", sizeof(tprBSAEvent));
+        for (i = 0; i < sizeof(tprBSAEvent); i++)
+            printf("%02x", ((unsigned char *)message)[i]);
+        printf("\n");
         break;
     }
     }
