@@ -1,6 +1,18 @@
 #
 # Release Notes for Timing Pattern Receiver module, tpr
 #
+# Revision numbering
+# R<MAJOR>.<MINOR>.<BUILD>
+# MAJOR updates for major revisions
+# MINOR updates for any src changes
+# BUILD updates for configuration only changes
+#
+R0.1.1	2017-09-17 Bruce Hill
+	Configuration changes only
+	Updated CONFIG_SITE to start from default CROSS targets and remove
+		unsupported targets so we can build for different base versions
+		w/ different sets of CROSS targets
+
 R0.1.0	2017-09-17 Bruce Hill
 	First git repo based release
 	Includes Mike Browne's:
