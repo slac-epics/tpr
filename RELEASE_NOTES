@@ -1,0 +1,8 @@
+#
+# Release Notes for Timing Pattern Receiver module, tpr
+#
+R0.1.0	2017-09-17 Bruce Hill
+	First git repo based release
+	Includes Mike Browne's:
+		First pass client support.
+		Differentiate 1 Hz fixed and AC, fix debug print, fix 12 in mbbo.
