@@ -6,7 +6,7 @@
 #         EVT  - EPICS event number
 #	  TPR  - TPR base PV
 
-record(longout, "$(BASE):CH$(N):EVENTNUM")
+record(longout, "$(BASE):EVENTNUM")
 {
   field(DESC, "TPR Channel $(N) EPICS Event")
   field(DTYP, "TPR Client")
@@ -16,7 +16,7 @@ record(longout, "$(BASE):CH$(N):EVENTNUM")
   field(VAL,  "$(EVT)")
 }
 
-record(event, "$(BASE):CH$(N):EVENT" )
+record(event, "$(BASE):EVENT" )
 {
   field(DESC,  "TPR Channel $(N) Event")
   field(DTYP,  "TPR Client" )
@@ -24,10 +24,10 @@ record(event, "$(BASE):CH$(N):EVENT" )
   field(PRIO,  "HIGH" )
   field(SCAN,  "I/O Intr" )
   field(TSE,   "-2")
-  field(FLNK,  "$(BASE):CH$(N):MESSAGE")
+  field(FLNK,  "$(BASE):MESSAGE")
 }
 
-record(waveform, "$(BASE):CH$(N):MESSAGE")
+record(waveform, "$(BASE):MESSAGE")
 {
   field(DESC,  "TPR Channel $(N) Timing Message")
   field(DTYP,  "TPR Client" )
@@ -35,28 +35,28 @@ record(waveform, "$(BASE):CH$(N):MESSAGE")
   field(NELM,  "21")
   field(INP,   "@$(CARD) $(N) MESSAGE")
   field(TSE,   "-2")
-  field(FLNK,  "$(BASE):CH$(N):PIDL")
+  field(FLNK,  "$(BASE):PIDL")
 }
 
-record(longin, "$(BASE):CH$(N):PIDL")
+record(longin, "$(BASE):PIDL")
 {
   field(DESC,  "TPR Channel $(N) Pulse ID (L)")
   field(DTYP,  "TPR Client" )
   field(INP,   "@$(CARD) $(N) PIDL")
   field(TSE,   "-2")
-  field(FLNK,  "$(BASE):CH$(N):PIDH")
+  field(FLNK,  "$(BASE):PIDH")
 }
 
-record(longin, "$(BASE):CH$(N):PIDH")
+record(longin, "$(BASE):PIDH")
 {
   field(DESC,  "TPR Channel $(N) Pulse ID (H)")
   field(DTYP,  "TPR Client" )
   field(INP,   "@$(CARD) $(N) PIDH")
   field(TSE,   "-2")
-  field(FLNK,  "$(BASE):CH$(N):TIMING_MODE")
+  field(FLNK,  "$(BASE):TIMING_MODE")
 }
 
-record(bi, "$(BASE):CH$(N):TIMING_MODE")
+record(bi, "$(BASE):TIMING_MODE")
 {
   field(DESC,  "TPR Channel $(N) Timing Mode")
   field(DTYP,  "TPR Client" )
@@ -66,7 +66,7 @@ record(bi, "$(BASE):CH$(N):TIMING_MODE")
   field(ONAM, "LCLS-II")
 }
 
-record(calc, "$(BASE):CH$(N):CHANGE")
+record(calc, "$(BASE):CHANGE")
 {
   field(DESC,  "TPR Channel $(N) Change")
   field(INPA,  "$(TPR):LCLS1:CH$(N):CHANGE CPP")
