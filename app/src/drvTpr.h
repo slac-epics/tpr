@@ -3,6 +3,9 @@
 #include<epicsMutex.h>         /* EPICS Mutex support library                                    */
 #include<epicsTime.h>          /* EPICS Time support library                                     */
 #include"tpr.h"
+#include"timesyncAPI.h"
+
+#define MAX_TPR     2
 
 struct tprGlobalConfig {
     struct boRecord *boRecord[3];
@@ -14,6 +17,7 @@ struct tprGlobalConfig {
     struct mbboDirectRecord *mbboDirectRecord[1];
     struct longoutRecord *longoutRecord[1];
     struct longinRecord *longinRecord[1];
+#define FRAME   ((5<<8)|0)
 };
 
 struct tprChannelConfig {
@@ -35,26 +39,26 @@ struct tprChannelConfig {
 #define TRGDEL  ((4<<8)|3)
 #define TRGWID  ((4<<8)|4)
 #define TRGFDEL ((4<<8)|5)
-    struct longinRecord *longinRecord[2];
+    struct longinRecord *longinRecord[3];
 #define CHANGE  ((5<<8)|0)
 #define COUNT   ((5<<8)|1)
     IOSCANPVT ioscan;
 };
 
 typedef struct tprChannelState {
-    struct longoutRecord  *longoutRecord[1];
+    struct longoutRecord   *longoutRecord[1];
 #define ENUM    ((1<<8)|0)
-    struct eventRecord    *eventRecord[1];
+    struct eventRecord     *eventRecord[1];
 #define EVT     ((2<<8)|0)
-    struct waveformRecord *waveformRecord[1];
+    struct waveformRecord  *waveformRecord[1];
 #define MESSAGE ((3<<8)|0)
-    struct longinRecord   *longinRecord[2];
+    struct longinRecord    *longinRecord[2];
 #define PIDL    ((4<<8)|0)
 #define PIDH    ((4<<8)|1)
-    struct biRecord       *biRecord[1];
+    struct biRecord        *biRecord[1];
 #define TMODE   ((5<<8)|0)
-    IOSCANPVT ioscan;
-    int       mode;
+    IOSCANPVT      ioscan;
+    int            mode;
 } tprChannelState;
 
 typedef struct tprConfig {
@@ -80,7 +84,7 @@ extern int tprWrite(tprCardStruct *pCard, int reg, int chan, int value);
 extern int tprGetConfig(tprCardStruct *pCard, int chan, int reg);
 extern int tprDebug;
 
-#define WDEBUG(lhs, rhs) if (tprDebug & TPR_DEBUG_WRITE) printf("WRITE %d (0x%x) --> 0x%x\n", (rhs), (rhs), (u32)((char *)&(lhs) - (char *)pCard->r))
+#define WDEBUG(lhs, rhs) if (tprDebug & TPR_DEBUG_WRITE) printf("WRITE %d (0x%x) --> "#lhs" (0x%x)\n", (rhs), (rhs), (u32)((char *)&(pCard->r->lhs) - (char *)pCard->r))
 #define TPR_DEBUG_WRITE     1
 
 typedef struct dsetStruct {

@@ -10,12 +10,13 @@
 #include<longinRecord.h>
 #include<biRecord.h>
 #include"drvTpr.h"
-#include"evrTime.h"
+#include"timesyncAPI.h"
 #include"bsa_api.h"
 
 #define MAX_EVENT 256
 static struct timeInfo {
     tprCardStruct *pCard;
+    int            card;
     int            chan;
     long long      idx;
     tprEvent       message[MAX_TS_QUEUE];
@@ -23,6 +24,7 @@ static struct timeInfo {
 
 struct dpvtStruct {
     tprCardStruct *pCard;
+    int            card;
     int            chan;
     int            idx;
 };
@@ -73,10 +75,11 @@ static struct lookup *do_lookup(DBLINK *l, int *card, int *chan)
     return NULL;
 }
 
-static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int chan, int idx)
+static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int card, int chan, int idx)
 {
     struct dpvtStruct *p = (struct dpvtStruct *)malloc(sizeof(struct dpvtStruct));
     p->pCard = pCard;
+    p->card = card;
     p->chan = chan;
     p->idx = idx;
     return p;
@@ -94,7 +97,7 @@ static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int chan, int idx)
         if (!pCard)                                                           \
             return S_dev_badCard;                                             \
         pCard->client[chan].TYPE[l->index & 255] = pRec;                      \
-        pRec->dpvt = makeDpvt(pCard, chan, l->index);                         \
+        pRec->dpvt = makeDpvt(pCard, card, chan, l->index);                   \
         return 0;                                                             \
     }
 
@@ -105,9 +108,10 @@ static epicsStatus tprProclongoutRecord(longoutRecord *pRec)
     if (dpvt->idx == ENUM) {
         if (pRec->mlst >= 0 && pRec->mlst < MAX_EVENT)
             ti[pRec->mlst].pCard = NULL;
-        if (pRec->val < 0 || pRec->mlst >= MAX_EVENT)
+        if (pRec->val < 0 || pRec->val >= MAX_EVENT)
             return 0;
         ti[pRec->val].pCard = pCard;
+        ti[pRec->val].card = dpvt->card;
         ti[pRec->val].chan = dpvt->chan;
     } else
         return 1;
@@ -191,6 +195,7 @@ static epicsStatus tprProcbiRecord(biRecord *pRec)
         pRec->val = pCard->client[dpvt->chan].mode;
         pRec->time.secPastEpoch = e->seconds;
         pRec->time.nsec = e->nanosecs;
+        pRec->udf = 0;
     }
     return 2;
 }
@@ -230,30 +235,34 @@ epicsExportAddress (dset, devTprCeventRecord);
 int tprTimeGet(epicsTimeStamp *epicsTime_ps, int eventCode)
 {
     if (eventCode < 0 || eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
-        printf("tTG! bad %d\n", eventCode);
         return epicsTimeERROR;
     } else {
         tprEvent *e = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
         epicsTime_ps->secPastEpoch = e->seconds;
         epicsTime_ps->nsec = e->nanosecs;
-        printf("tTG! OK\n");
         return epicsTimeOK;
     }
 }
 
+static uint64_t lastfid = 0;
+
 void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
 {
-    if (pCard->config.mode < 0)
+    if (pCard->config.mode < 0) {
+        printf("EVENT, but not configured!\n");
         return;
+    }
     switch (message->tag & TAG_TYPE_MASK) {
     case TAG_EVENT: {
         tprEvent *e = (tprEvent *)message;
+        if (e->pulseID > lastfid)
+            lastfid = e->pulseID;
         int evt = pCard->client[chan].longoutRecord[0]->val;
         if (evt < 0 || evt >= MAX_EVENT)
             return;
         memcpy(&ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK], e, sizeof(tprEvent));
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
-        post_event(evt);
+        //post_event(evt);
         scanIoRequest(pCard->client[chan].ioscan);
         break;
     }
@@ -286,10 +295,11 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
     }
 }
 
-int evrTimeGetFifo(epicsTimeStamp     *epicsTime_ps,
-                   unsigned int        eventCode,
-                   unsigned long long *idx,
-                   int                 incr)
+int timesyncGetFifo(epicsTimeStamp     *epicsTime_ps,
+                    long long          *fid,
+                    unsigned int        eventCode,
+                    unsigned long long *idx,
+                    int                 incr)
 {
     tprEvent *e;
     if (!epicsTime_ps || !idx || eventCode >= MAX_EVENT)
@@ -304,4 +314,9 @@ int evrTimeGetFifo(epicsTimeStamp     *epicsTime_ps,
     epicsTime_ps->secPastEpoch = e->seconds;
     epicsTime_ps->nsec = e->nanosecs;
     return 0;
+}
+
+long long  timesyncGetLastFiducial(void)
+{
+    return lastfid;
 }

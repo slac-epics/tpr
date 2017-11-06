@@ -25,6 +25,7 @@ record(event, "$(BASE):EVENT" )
   field(SCAN,  "I/O Intr" )
   field(TSE,   "-2")
   field(FLNK,  "$(BASE):MESSAGE")
+  field(VAL,   "0")
 }
 
 record(waveform, "$(BASE):MESSAGE")
@@ -62,6 +63,7 @@ record(bi, "$(BASE):TIMING_MODE")
   field(DTYP,  "TPR Client" )
   field(INP,   "@$(CARD) $(N) TMODE")
   field(TSE,   "-2")
+  field(PINI, "YES")
   field(ZNAM, "LCLS-I")
   field(ONAM, "LCLS-II")
 }
