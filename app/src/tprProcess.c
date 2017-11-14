@@ -248,8 +248,7 @@ static uint64_t lastfid = 0;
 
 void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
 {
-    if (pCard->config.mode < 0) {
-        printf("EVENT, but not configured!\n");
+    if (pCard->r && pCard->config.mode < 0) {
         return;
     }
     switch (message->tag & TAG_TYPE_MASK) {
@@ -262,7 +261,6 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
             return;
         memcpy(&ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK], e, sizeof(tprEvent));
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
-        //post_event(evt);
         scanIoRequest(pCard->client[chan].ioscan);
         break;
     }

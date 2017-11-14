@@ -140,6 +140,8 @@ int tprGetConfig(tprCardStruct *pCard, int chan, int reg)
 // Return 1 if we need to flag a change, 0 otherwise.
 int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
 {
+    if (!pCard->r)    // Not the master, so we really shouldn't be calling this at all!
+        return 0;
     switch (reg) {
     case CRESET:
         WDEBUG(countReset, 1);
@@ -179,7 +181,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         for (i = 0; i < 12; i++) {       /* Set the parameters */
             if (tprDebug & TPR_DEBUG_WRITE) printf("i=%d\n", i);
             for (j = 0; initorder[j].id >= 0; j++) {
-                printf("%s\n", initorder[j].name);
+                if (tprDebug & TPR_DEBUG_WRITE) printf("%s\n", initorder[j].name);
                 tprWrite(pCard, initorder[j].id, i, tprGetConfig(pCard, i, initorder[j].id));
             }
         }

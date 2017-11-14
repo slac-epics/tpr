@@ -266,7 +266,8 @@ static const iocshFuncDef TprStartDef = {"TprStart", 1, TprStartArgs};
 static void TprStartCall(const iocshArgBuf *args)
 {
     tprCardStruct *pCard = tprGetCard(args[0].ival);
-    tprWrite(pCard, MODE, -1, tprGetConfig(pCard, -1, MODE));
+    if (pCard->r)
+        tprWrite(pCard, MODE, -1, tprGetConfig(pCard, -1, MODE));  // Set mode if master!
 }
 
 /* Registration APIs */
