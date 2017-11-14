@@ -35,3 +35,11 @@ record(bo, "$(BASE):TIMING_MODE")
   field(ZNAM, "LCLS-I")
   field(ONAM, "LCLS-II")
 }
+
+record(longin, "$(BASE):FRAMECNT")
+{
+  field(DESC,  "TPR Frame Count")
+  field(DTYP, "TPR Master")
+  field(INP,  "@$(CARD) -1 - FRAME")
+  field(SCAN, "1 second")
+}

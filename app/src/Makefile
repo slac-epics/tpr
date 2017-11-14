@@ -6,12 +6,12 @@ include $(TOP)/configure/CONFIG
 # build a library
 
 
-# INC+=evrTime.h
-# DBDINC += longSubRecord
+INC+=timesyncAPI.h
 DBD += tpr.dbd
-LIBRARY_IOC = tpr
+LIBRARY_IOC = tpr noBSA
 tpr_SRCS += devTpr.c drvTpr.c tprProcess.c
 tpr_LIBS += $(EPICS_BASE_IOC_LIBS)
+noBSA_SRCS += noBSA.c
 
 #===========================
 

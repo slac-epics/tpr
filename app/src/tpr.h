@@ -170,8 +170,8 @@ typedef struct tprBSAControl {
     uint32_t         nanosecs;
     uint32_t         seconds;
     uint64_t         init;
-    uint64_t         major;
     uint64_t         minor;
+    uint64_t         major;                  // Both == invalid alarm OK!
 } __attribute__((packed)) tprBSAControl;
 
 typedef struct tprBSAEvent {

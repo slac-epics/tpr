@@ -139,8 +139,8 @@ record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):TSMASK")
 record(longout, "$(BASE):LCLS$(L):CH$(N):SEQ")
 {
   field(DESC,  "TPR Channel $(N) seq bit")
-  field(DTYP, "TPR Master")
-  field(OUT,  "@$(CARD) $(L) $(N) SEQ")
+  field(DTYP,  "TPR Master")
+  field(OUT,   "@$(CARD) $(L) $(N) SEQ")
   field(OMSL,  "supervisory")
 }
 

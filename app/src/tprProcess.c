@@ -1,29 +1,39 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<dbAccess.h>           /* EPICS Database access definitions                              */
-#include<devSup.h>             /* EPICS Device support layer structures and symbols              */
-#include<epicsExport.h>        /* EPICS Symbol exporting macro definitions                       */
+#include<dbAccess.h>           /* EPICS Database access definitions                   */
+#include<devSup.h>             /* EPICS Device support layer structures and symbols   */
+#include<epicsExport.h>        /* EPICS Symbol exporting macro definitions            */
 #include<longoutRecord.h>
 #include<eventRecord.h>
 #include<waveformRecord.h>
 #include<longinRecord.h>
 #include<biRecord.h>
 #include"drvTpr.h"
+#include"timesyncAPI.h"
+#include"bsa_api.h"
 
 #define MAX_EVENT 256
-#define MAX_TIQ   256
 static struct timeInfo {
     tprCardStruct *pCard;
+    int            card;
     int            chan;
     long long      idx;
-    tprEvent       message[MAX_TIQ];
+    tprEvent       message[MAX_TS_QUEUE];
 } ti[MAX_EVENT];
 
 struct dpvtStruct {
     tprCardStruct *pCard;
+    int            card;
     int            chan;
     int            idx;
+};
+
+static struct BsaTimingPatternStruct pattern = {
+    0LL,
+    0LL, 0LL, 0LL, 0LL, 
+    0LL, 0LL,
+    {0, 0}
 };
 
 static struct lookup {
@@ -65,10 +75,11 @@ static struct lookup *do_lookup(DBLINK *l, int *card, int *chan)
     return NULL;
 }
 
-static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int chan, int idx)
+static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int card, int chan, int idx)
 {
     struct dpvtStruct *p = (struct dpvtStruct *)malloc(sizeof(struct dpvtStruct));
     p->pCard = pCard;
+    p->card = card;
     p->chan = chan;
     p->idx = idx;
     return p;
@@ -86,7 +97,7 @@ static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int chan, int idx)
         if (!pCard)                                                           \
             return S_dev_badCard;                                             \
         pCard->client[chan].TYPE[l->index & 255] = pRec;                      \
-        pRec->dpvt = makeDpvt(pCard, chan, l->index);                         \
+        pRec->dpvt = makeDpvt(pCard, card, chan, l->index);                   \
         return 0;                                                             \
     }
 
@@ -97,9 +108,10 @@ static epicsStatus tprProclongoutRecord(longoutRecord *pRec)
     if (dpvt->idx == ENUM) {
         if (pRec->mlst >= 0 && pRec->mlst < MAX_EVENT)
             ti[pRec->mlst].pCard = NULL;
-        if (pRec->val < 0 || pRec->mlst >= MAX_EVENT)
+        if (pRec->val < 0 || pRec->val >= MAX_EVENT)
             return 0;
         ti[pRec->val].pCard = pCard;
+        ti[pRec->val].card = dpvt->card;
         ti[pRec->val].chan = dpvt->chan;
     } else
         return 1;
@@ -116,7 +128,7 @@ static epicsStatus tprProceventRecord(eventRecord *pRec)
     if (!ti[evt].idx)
         return 1;
     if (dpvt->idx == EVT) {
-        tprEvent *e = &ti[evt].message[(ti[evt].idx-1)&(MAX_TIQ-1)];
+        tprEvent *e = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         pRec->time.secPastEpoch = e->seconds;
         pRec->time.nsec = e->nanosecs;
     } else
@@ -132,7 +144,7 @@ static epicsStatus tprProcwaveformRecord(waveformRecord *pRec)
     if (evt < 0 || evt >= MAX_EVENT || !ti[evt].idx)
         return 1;
     if (dpvt->idx == MESSAGE) {
-        tprEvent *e = &ti[evt].message[(ti[evt].idx-1)&(MAX_TIQ-1)];
+        tprEvent *e = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         memcpy(pRec->bptr, e, sizeof(tprEvent));
         pRec->nord = sizeof(tprEvent) / sizeof(u32);
         pRec->time.secPastEpoch = e->seconds;
@@ -152,7 +164,7 @@ static epicsStatus tprProclonginRecord(longinRecord *pRec)
         return 1;
     if (!ti[evt].idx)
         return 1;
-    e = &ti[evt].message[(ti[evt].idx-1)&(MAX_TIQ-1)];
+    e = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
     switch (dpvt->idx) {
     case PIDL:
         pRec->val = e->pulseID;
@@ -179,10 +191,11 @@ static epicsStatus tprProcbiRecord(biRecord *pRec)
     if (!ti[evt].idx)
         return 1;
     if (dpvt->idx == TMODE) {
-        e = &ti[evt].message[(ti[evt].idx-1)&(MAX_TIQ-1)];
+        e = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         pRec->val = pCard->client[dpvt->chan].mode;
         pRec->time.secPastEpoch = e->seconds;
         pRec->time.nsec = e->nanosecs;
+        pRec->udf = 0;
     }
     return 2;
 }
@@ -222,56 +235,86 @@ epicsExportAddress (dset, devTprCeventRecord);
 int tprTimeGet(epicsTimeStamp *epicsTime_ps, int eventCode)
 {
     if (eventCode < 0 || eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
-        printf("tTG! bad %d\n", eventCode);
         return epicsTimeERROR;
     } else {
-        tprEvent *e = &ti[eventCode].message[(ti[eventCode].idx-1)&(MAX_TIQ-1)];
+        tprEvent *e = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
         epicsTime_ps->secPastEpoch = e->seconds;
         epicsTime_ps->nsec = e->nanosecs;
-        printf("tTG! OK\n");
         return epicsTimeOK;
     }
 }
 
+static uint64_t lastfid = 0;
+
 void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
 {
-    if (pCard->config.mode < 0)
+    if (pCard->r && pCard->config.mode < 0) {
         return;
+    }
     switch (message->tag & TAG_TYPE_MASK) {
     case TAG_EVENT: {
         tprEvent *e = (tprEvent *)message;
+        if (e->pulseID > lastfid)
+            lastfid = e->pulseID;
         int evt = pCard->client[chan].longoutRecord[0]->val;
         if (evt < 0 || evt >= MAX_EVENT)
             return;
-        memcpy(&ti[evt].message[ti[evt].idx++ & (MAX_TIQ-1)], e, sizeof(tprEvent));
+        memcpy(&ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK], e, sizeof(tprEvent));
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
-        post_event(evt);
         scanIoRequest(pCard->client[chan].ioscan);
         break;
     }
     case TAG_BSA_CTRL: {
         tprBSAControl *bc = (tprBSAControl *)message;
-        int i;
-        printf("BSActrl %d.%09d: init=%llx\n", bc->seconds, bc->nanosecs, (long long unsigned int)bc->init);
-        printf("\t%ld: ", sizeof(tprBSAControl));
-        for (i = 0; i < sizeof(tprBSAControl); i++)
-            printf("%02x", ((unsigned char *)message)[i]);
-        printf("\n");
+        pattern.edefInitMask = bc->init;
+        pattern.edefActiveMask = 0;
+        pattern.edefAvgDoneMask = 0;
+        pattern.edefUpdateMask = 0;
+        pattern.edefMinorMask = (pattern.edefMinorMask & ~bc->init) | (bc->init & bc->minor);
+        pattern.edefMajorMask = (pattern.edefMajorMask & ~bc->init) | (bc->init & bc->major);
+        pattern.timeStamp.nsec = bc->nanosecs;
+        pattern.timeStamp.secPastEpoch = bc->seconds;
+        pattern.pulseId = 0;  /* Do a lookup? */
+        BsaTimingCallback(&pattern);
         break;
     }
     case TAG_BSA_EVENT: {
         tprBSAEvent *be = (tprBSAEvent *)message;
-        int i;
-        printf("BSAevent active=%llx, avgdone=%llx, update=%llx, pid=%llx, ts=%d.%09d\n",
-                   (long long unsigned int)be->active, (long long unsigned int)be->avgdone,
-                   (long long unsigned int)be->update, (long long unsigned int)be->PID,
-                   be->seconds, be->nanosecs);
-        printf("\t%ld: ", sizeof(tprBSAEvent));
-        for (i = 0; i < sizeof(tprBSAEvent); i++)
-            printf("%02x", ((unsigned char *)message)[i]);
-        printf("\n");
+        pattern.edefInitMask = 0;
+        pattern.edefActiveMask = be->active;
+        pattern.edefAvgDoneMask = be->avgdone;
+        pattern.edefUpdateMask = be->update;
+        pattern.timeStamp.nsec = be->nanosecs;
+        pattern.timeStamp.secPastEpoch = be->seconds;
+        pattern.pulseId = be->PID;
+        BsaTimingCallback(&pattern);
         break;
     }
     }
 }
 
+int timesyncGetFifo(epicsTimeStamp     *epicsTime_ps,
+                    long long          *fid,
+                    unsigned int        eventCode,
+                    unsigned long long *idx,
+                    int                 incr)
+{
+    tprEvent *e;
+    if (!epicsTime_ps || !idx || eventCode >= MAX_EVENT)
+        return epicsTimeERROR;
+    if (incr == MAX_TS_QUEUE)
+        *idx = ti[eventCode].idx - 1;
+    else
+        *idx += incr;
+    if (*idx + MAX_TS_QUEUE < ti[eventCode].idx || *idx >= ti[eventCode].idx)
+        return epicsTimeERROR;
+    e = &ti[eventCode].message[*idx & MAX_TS_QUEUE_MASK];
+    epicsTime_ps->secPastEpoch = e->seconds;
+    epicsTime_ps->nsec = e->nanosecs;
+    return 0;
+}
+
+long long  timesyncGetLastFiducial(void)
+{
+    return lastfid;
+}

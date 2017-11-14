@@ -28,8 +28,7 @@
 #include<aSubRecord.h>
 #include"drvTpr.h"
 
-static epicsMutexId cardListLock;
-static ELLLIST cardList;
+static tprCardStruct *tprCards[MAX_TPR] = { NULL };
 int tprDebug = 0;
 
 extern int tprTimeGet(epicsTimeStamp *epicsTime_ps, int eventCode);
@@ -89,18 +88,7 @@ static int tprIrqHandlerThread(void *p)
 
 tprCardStruct *tprGetCard(int card)
 {
-    tprCardStruct *pCard;
-    epicsMutexLock(cardListLock);
-    for (pCard = (tprCardStruct *)ellFirst(&cardList);
-         pCard != NULL;
-         pCard = (tprCardStruct *)ellNext(&pCard->link)) {
-        if (pCard->card == card) {
-            epicsMutexUnlock(cardListLock);
-            return pCard;
-        }
-    }
-    epicsMutexUnlock(cardListLock);
-    return NULL;
+    return (card >= 0 && card < MAX_TPR) ? tprCards[card] : NULL;
 }
 
 static void TprConfigure(int card, int minor)
@@ -112,6 +100,10 @@ static void TprConfigure(int card, int minor)
     tprQueues *q = NULL;
     int isNew = 0;
 
+    if (card < 0 || card >= MAX_TPR) {
+        errlogPrintf ("%s: Card %d declared, limit is 0 to %d\n", __func__, card, MAX_TPR);
+        return;
+    }
     pCard = tprGetCard(card);
     if (pCard && pCard->mmask & (1 << minor)) {
         errlogPrintf ("%s: Card %d, minor %d has already been configured\n", __func__, card, minor);
@@ -173,13 +165,8 @@ static void TprConfigure(int card, int minor)
     if (q)
         pCard->q = q;
 
-    if (isNew) {
-        epicsMutexLock(cardListLock);
-        ellAdd(&cardList, &pCard->link); 
-        epicsMutexUnlock(cardListLock);
-    }
-
-    /* Finish initialization! */
+    if (isNew)
+        tprCards[card] = pCard;
 }
 
 static void TprDebugLevel(int level)
@@ -195,36 +182,32 @@ static void TprDebugLevel(int level)
 /* Guideline: 0=one-line per device, 1=more, 2=lots of info */
 static int TprDrvReport(int level)
 {
-    tprCardStruct *pCard;
-    epicsMutexLock(cardListLock);
-    for (pCard = (tprCardStruct *)ellFirst(&cardList);
-         pCard != NULL;
-         pCard = (tprCardStruct *)ellNext(&pCard->link)) {
-        printf("TPR Card %d, Modes 0x%x\n", pCard->card, pCard->mmask);
+    int i;
+    for (i = 0; i < MAX_TPR; i++) {
+        tprCardStruct *pCard = tprCards[i];
+        if (pCard) {
+            printf("TPR Card %d, Modes 0x%x\n", pCard->card, pCard->mmask);
+        }
     }
-    epicsMutexUnlock(cardListLock);
     return 0;
 }
 
 static int TprDrvInitialize(void)
 {
-    tprCardStruct *pCard;
+    int i;
     static int done = 0;
     if (done)
         return 0;
     done = 1;
 
-    epicsMutexLock(cardListLock);
-    for (pCard = (tprCardStruct *)ellFirst(&cardList);
-         pCard != NULL;
-         pCard = (tprCardStruct *)ellNext(&pCard->link)) {
-        if (pCard->mmask & ~(1 << DEVNODE_MINOR_CONTROL)) {
+    for (i = 0; i < MAX_TPR; i++) {
+        tprCardStruct *pCard = tprCards[i];
+        if (pCard && (pCard->mmask & ~(1 << DEVNODE_MINOR_CONTROL))) {
             epicsThreadMustCreate("tprIrqHandler", epicsThreadPriorityHigh,
                                   epicsThreadGetStackSize(epicsThreadStackMedium),
                                   (EPICSTHREADFUNC)tprIrqHandlerThread, pCard);
         }
     }
-    epicsMutexUnlock(cardListLock);
 
     if (generalTimeRegisterEventProvider("tprTimeGet", 2000, (TIMEEVENTFUN) tprTimeGet)) {
         printf("Cannot register TPR time provider?!?\n");
@@ -283,14 +266,13 @@ static const iocshFuncDef TprStartDef = {"TprStart", 1, TprStartArgs};
 static void TprStartCall(const iocshArgBuf *args)
 {
     tprCardStruct *pCard = tprGetCard(args[0].ival);
-    tprWrite(pCard, MODE, -1, tprGetConfig(pCard, -1, MODE));
+    if (pCard->r)
+        tprWrite(pCard, MODE, -1, tprGetConfig(pCard, -1, MODE));  // Set mode if master!
 }
 
 /* Registration APIs */
 static void drvTprRegister()
 {
-    cardListLock = epicsMutexCreate();
-    ellInit(&cardList);
     iocshRegister(&TprConfigureDef, TprConfigureCall );
     iocshRegister(&TprDebugLevelDef, TprDebugLevelCall );
     iocshRegister(&TprDrvReportDef, TprDrvReportCall );
