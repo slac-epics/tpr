@@ -7,6 +7,14 @@
 # MINOR updates for any src changes
 # BUILD updates for configuration only changes
 #
+R0.2.0	2017-11-17 Bruce Hill
+	Broke out API functions to timingApi.h.
+	Updated code to work w/ timingApi names and structures.
+	Merged in Mike's updates from new svn import.
+	Minor changes for client-only mode.
+	Epics 3.15ized version.  Also get rid of evrTime.h in favor of timesyncAPI.h.
+	Remove BSA code, as this will be a separate module.
+
 R0.1.1	2017-09-17 Bruce Hill
 	Configuration changes only
 	Updated CONFIG_SITE to start from default CROSS targets and remove

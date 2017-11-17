@@ -41,6 +41,6 @@ EPICS_BASE = $(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 -include $(TOP)/../../EPICS_BASE.check
 
 #MY_MODULES=/reg/neh/home4/mcbrowne/trunk12/modules
-MY_MODULES=/afs/slac/u/ey/bhill/git-wa/modules
-TIMING_API	= $(MY_MODULES)/timingApi-git
+#MY_MODULES=/afs/slac/u/ey/bhill/git-wa/modules
+#TIMING_API	= $(MY_MODULES)/timingApi-git
 
