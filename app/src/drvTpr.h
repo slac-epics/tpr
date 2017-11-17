@@ -3,7 +3,7 @@
 #include<epicsMutex.h>         /* EPICS Mutex support library                                    */
 #include<epicsTime.h>          /* EPICS Time support library                                     */
 #include"tpr.h"
-#include"timesyncAPI.h"
+#include"timingFifoApi.h"
 
 #define MAX_TPR     2
 

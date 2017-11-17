@@ -6,7 +6,7 @@ include $(TOP)/configure/CONFIG
 # build a library
 
 
-INC+=timesyncAPI.h
+#INC+=timesyncAPI.h
 DBD += tpr.dbd
 LIBRARY_IOC = tpr noBSA
 tpr_SRCS += devTpr.c drvTpr.c tprProcess.c

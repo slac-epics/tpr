@@ -1,8 +1,7 @@
 #include<stdint.h>
-#include<epicsTime.h>
-#include"bsa_api.h"
+#include"bsaCallbackApi.h"
 
-void BsaTimingCallback(BsaTimingPattern newPattern)
+void noBsaTimingCallback( void * pUserPvt, BsaTimingData * newPattern )
 {
     return; /* NOP! */
 }
