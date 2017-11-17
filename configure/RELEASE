@@ -7,10 +7,13 @@
 # Check for valid macro definitions for module release directories
 # You can add tests here to make sure RELEASE.local defined valid
 # macros for all the module dependencies
-#ifeq ($(wildcard $(EPICS_BASE)/include),)
-#$(error Invalid EPICS_BASE: $(EPICS_BASE))
-#endif
-#ifeq ($(wildcard $(ASYN)/include),)
-#$(error Invalid ASYN: $(ASYN))
-#endif
+ifeq ($(wildcard $(EPICS_BASE)/include),)
+$(error Invalid EPICS_BASE: $(EPICS_BASE))
+endif
+ifeq ($(wildcard $(DIAG_TIMER)/include),)
+$(error Invalid DIAG_TIMER: $(DIAG_TIMER))
+endif
+ifeq ($(wildcard $(TIMING_API)/include),)
+$(error Invalid TIMING_API: $(TIMING_API))
+endif
 #...
