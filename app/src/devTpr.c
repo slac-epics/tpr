@@ -19,6 +19,7 @@
 #include <epicsExport.h>        /* EPICS Symbol exporting macro definitions                       */
 
 #include <boRecord.h>
+#include <biRecord.h>
 #include <mbboRecord.h>
 #include <mbboDirectRecord.h>
 #include <longinRecord.h>
@@ -41,6 +42,7 @@ static struct lookup {
     {"XBAR",    XBAR, 1},
     {"MODE",    MODE, 1},
     {"FRAME",   FRAME, 1},
+    {"RXLINK",  RXLINK, 1},
     {"ENABLE",  ENABLE, 0},
     {"BSAEN",   BSAEN, 0},
     {"TRIGEN",  TRIGEN, 0},
@@ -146,6 +148,8 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
     case CRESET:
         WDEBUG(countReset, 1);
         pCard->r->countReset = 1;
+        WDEBUG(countReset, 0);
+        pCard->r->countReset = 0;
         pCard->config.global.boRecord[CRESET]->val = 0;
         // Monitor?  Or RVAL?
         return 0;
@@ -342,11 +346,33 @@ static dsetStruct devTpr##TYPE = {                                            \
 };                                                                            \
 epicsExportAddress (dset, devTpr##TYPE);
 
+static epicsStatus tprProcbiRecord(biRecord *pRec)
+{
+    struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
+    tprCardStruct *pCard = dpvt->pCard;
+    int mode = pCard->config.mode;
+    unsigned int csr;
+    if (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))
+            return 0;
+    if (dpvt->lcls > 0) {
+    } else {
+        switch (dpvt->idx) {
+        case RXLINK:
+            csr = pCard->r->CSR;
+            pRec->val = (csr >> 1) & 1;
+            pRec->udf = 0;
+            break;
+        }
+    }
+    return 2;
+}
+
 INITDECL(boRecord, out)
 INITDECL(mbboRecord, out)
 INITDECL(mbboDirectRecord, out)
 INITDECL(longoutRecord, out)
 INITDECL(longinRecord, inp)
+INITDECL(biRecord, inp)
 
 PROCDECL(boRecord)
 PROCDECL(mbboRecord)
@@ -357,6 +383,7 @@ DSETDECL(boRecord)
 DSETDECL(mbboRecord)
 DSETDECL(mbboDirectRecord)
 DSETDECL(longoutRecord)
+DSETDECL(biRecord)
 
 static epicsStatus tprIointlonginRecord(int cmd, longinRecord *pRec, IOSCANPVT *iopvt)
 {
@@ -373,19 +400,22 @@ static epicsStatus tprProclonginRecord(longinRecord *pRec)
     int mode = pCard->config.mode;
     if (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))
             return 0;
-    if (dpvt->lcls > 0) {
+    if (dpvt->lcls >= 0) {
         switch (dpvt->idx) {
         case CHANGE:
             pRec->val++;
+            pRec->udf = 0;
             break;
         case COUNT:
             pRec->val = pCard->r->channel[dpvt->chan].eventCount;
+            pRec->udf = 0;
             break;
         }
     } else {
         switch (dpvt->idx) {
         case FRAME:
-            pRec->val = pCard->r->frameCount;
+            pRec->val = pCard->r->frameCount & 0x7fffffff;
+            pRec->udf = 0;
             break;
         }
     }

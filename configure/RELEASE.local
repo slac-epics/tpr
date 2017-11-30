@@ -15,7 +15,7 @@
 # Define the version strings for all needed modules
 # Use naming pattern:
 #   FOO_MODULE_VERSION = R1.2
-TIMING_API_MODULE_VERSION	= R0.1
+TIMING_API_MODULE_VERSION	= R0.2
 DIAG_TIMER_MODULE_VERSION	= R1.9.0
 
 # ==========================================================
@@ -42,5 +42,6 @@ EPICS_BASE = $(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 
 #MY_MODULES=/reg/neh/home4/mcbrowne/trunk12/modules
 #MY_MODULES=/afs/slac/u/ey/bhill/git-wa/modules
-#TIMING_API	= $(MY_MODULES)/timingApi-git
+#MY_MODULES=/reg/neh/home4/mcbrowne/git/modules
+#TIMING_API	= $(MY_MODULES)/timingApi
 

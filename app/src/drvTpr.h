@@ -17,7 +17,9 @@ struct tprGlobalConfig {
     struct mbboDirectRecord *mbboDirectRecord[1];
     struct longoutRecord *longoutRecord[1];
     struct longinRecord *longinRecord[1];
-#define FRAME   ((5<<8)|0)
+#define FRAME   ((1<<8)|0)
+    struct biRecord *biRecord[1];
+#define RXLINK  ((2<<8)|0)
 };
 
 struct tprChannelConfig {
@@ -26,12 +28,12 @@ struct tprChannelConfig {
 #define BSAEN   ((1<<8)|1)
 #define TRIGEN  ((1<<8)|2)
 #define POL     ((1<<8)|3)
-    struct mbboRecord *mbboRecord[3];
+    struct mbboRecord *mbboRecord[2];
 #define EVENT   ((2<<8)|0)
-#define DMASK   ((2<<8)|1)
-#define DMODE   ((2<<8)|2)
-    struct mbboDirectRecord *mbboDirectRecord[1];
-#define TSMASK  ((3<<8)|1)
+#define DMODE   ((2<<8)|1)
+    struct mbboDirectRecord *mbboDirectRecord[2];
+#define TSMASK  ((3<<8)|0)
+#define DMASK   ((3<<8)|1)
     struct longoutRecord *longoutRecord[6];
 #define SEQ     ((4<<8)|0)
 #define BSADEL  ((4<<8)|1)
@@ -42,6 +44,7 @@ struct tprChannelConfig {
     struct longinRecord *longinRecord[3];
 #define CHANGE  ((5<<8)|0)
 #define COUNT   ((5<<8)|1)
+    struct biRecord *biRecord[1];
     IOSCANPVT ioscan;
 };
 
@@ -72,7 +75,7 @@ typedef struct tprCardStruct {
     int              card;
     int              mmask;
     epicsMutexId     cardLock;
-    int              fd[MOD_SHARED];
+    int              fd[MOD_SHARED+1];
     tprReg          *r;
     tprQueues       *q;
     tprConfig        config;

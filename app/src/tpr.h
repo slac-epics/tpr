@@ -4,6 +4,7 @@ typedef uint32_t __u32;
 
 #define DEVNODE_NAME_BASE	"/dev/tpr"
 #define DEVNODE_MINOR_CONTROL   12
+#define DEVNODE_MINOR_BSA       13
 #define MOD_SHARED 12
 #define TPR_CONTROL_WINDOW      sizeof(struct TprReg)
 #define TPR_QUEUE_WINDOW        ((sizeof(struct TprQueues) + PAGE_SIZE) & PAGE_MASK)
@@ -12,7 +13,7 @@ typedef uint32_t __u32;
 
 /* These must be powers of two!!! */
 #define MAX_TPR_ALLQ (32*1024)
-#define MAX_TPR_CHNQ  1024
+#define MAX_TPR_BSAQ  1024
 #define MSG_SIZE      32
 
 /* DMA Buffer Size, Bytes (could be as small as 512B) */
@@ -21,10 +22,6 @@ typedef uint32_t __u32;
 
 struct TprEntry {
   u32 word[MSG_SIZE];
-};
-
-struct ChnQueue {
-  struct TprEntry entry[MAX_TPR_CHNQ];
 };
 
 struct TprQIndex {
@@ -38,10 +35,10 @@ struct TprQIndex {
  */
 typedef struct TprQueues {
   struct TprEntry  allq  [MAX_TPR_ALLQ]; /* master queue of shared messages */
-  struct ChnQueue  chnq  [MOD_SHARED];   /* queue of single channel messages */
+  struct TprEntry  bsaq  [MAX_TPR_BSAQ]; // queue of BSA messages
   struct TprQIndex allrp [MOD_SHARED];   /* indices into allq */
   long long        allwp [MOD_SHARED];   /* write pointer into allrp */
-  long long        chnwp [MOD_SHARED];   /* write pointer into chnq's */
+  long long        bsawp;
   long long        gwp;
   int              fifofull;
 } tprQueues;

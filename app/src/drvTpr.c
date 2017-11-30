@@ -31,7 +31,8 @@
 static tprCardStruct *tprCards[MAX_TPR] = { NULL };
 int tprDebug = 0;
 
-extern int tprTimeGet(epicsTimeStamp *epicsTime_ps, int eventCode);
+extern int tprCurrentTimestamp(epicsTimeStamp *epicsTime_ps, int eventCode);
+extern int tprGetEventTimestamp(epicsTimeStamp *epicsTime_ps, int eventCode);
 extern void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message);
 
 static int tprIrqHandlerThread(void *p)
@@ -41,7 +42,8 @@ static int tprIrqHandlerThread(void *p)
     fd_set all;
     int i, mfd = -1;
     int64_t allrp[MOD_SHARED];
-    int64_t chnrp[MOD_SHARED];
+    int64_t bsarp = 0;
+    int have_bsa = pCard->mmask & (1 << DEVNODE_MINOR_BSA);
 
     FD_ZERO(&all);
     for (i = 0; i < DEVNODE_MINOR_CONTROL; i++) {
@@ -50,8 +52,13 @@ static int tprIrqHandlerThread(void *p)
                 mfd = pCard->fd[i];
             FD_SET(pCard->fd[i], &all);
             allrp[i] = q->allwp[i];
-            chnrp[i] = q->chnwp[i];
         }
+    }
+    if (have_bsa) {
+        if (pCard->fd[DEVNODE_MINOR_BSA-1] > mfd)
+            mfd = pCard->fd[DEVNODE_MINOR_BSA-1];
+        FD_SET(pCard->fd[DEVNODE_MINOR_BSA-1], &all);
+        bsarp = q->bsawp;
     }
     mfd++;
 
@@ -63,6 +70,19 @@ static int tprIrqHandlerThread(void *p)
         cnt = select(mfd, &rds, NULL, NULL, NULL);
         if (cnt < 0)
             continue;  /* Assume we were just interrupted? */
+
+        if (have_bsa && FD_ISSET(pCard->fd[DEVNODE_MINOR_BSA-1], &rds)) {
+            nb = read(pCard->fd[DEVNODE_MINOR_BSA-1], buf, 32); /* Why 32? */
+            if (nb <= 0)
+                continue;   /* This can't be good... */
+
+            while(bsarp < q->bsawp) {
+                tprMessageProcess(pCard, DEVNODE_MINOR_BSA,
+                                  (tprHeader *)&q->bsaq[bsarp++ & (MAX_TPR_BSAQ-1)].word[0]);
+            }
+            cnt--;
+        }
+            
         for (i = 0; cnt && i < DEVNODE_MINOR_CONTROL; i++) {
             if (!FD_ISSET(pCard->fd[i], &rds))
                 continue;
@@ -70,11 +90,6 @@ static int tprIrqHandlerThread(void *p)
             if (nb <= 0)
                 continue;   /* This can't be good... */
 
-            while(chnrp[i] < q->chnwp[i]) {
-                tprMessageProcess(pCard, i,
-                                  (tprHeader *)&q->chnq[i].entry[chnrp[i]++
-                                                                 & (MAX_TPR_CHNQ-1)].word[0]);
-            }
             while(allrp[i] < q->allwp[i]) {
                 tprMessageProcess(pCard, i,
                                   (tprHeader *)&q->allq[q->allrp[i].idx[allrp[i]++ & (MAX_TPR_ALLQ-1)]
@@ -109,8 +124,11 @@ static void TprConfigure(int card, int minor)
         errlogPrintf ("%s: Card %d, minor %d has already been configured\n", __func__, card, minor);
         return;
     }
-    ret = snprintf(strDevice, sizeof(strDevice), "%s%c%c", DEVNODE_NAME_BASE, card + 'a',
-                   (minor == DEVNODE_MINOR_CONTROL) ? 0 : ((minor <= 9) ? ('0' + minor)
+    if (minor == DEVNODE_MINOR_BSA)
+        ret = snprintf(strDevice, sizeof(strDevice), "%s%cBSA", DEVNODE_NAME_BASE, card + 'a');
+    else
+        ret = snprintf(strDevice, sizeof(strDevice), "%s%c%c", DEVNODE_NAME_BASE, card + 'a',
+                       (minor == DEVNODE_MINOR_CONTROL) ? 0 : ((minor <= 9) ? ('0' + minor)
                                                                         : ('a' - 10 + minor)));
     if (ret < 0) {
         errlogPrintf("%s@%d(snprintf): %s.\n", __func__, __LINE__, strerror(-ret));
@@ -159,7 +177,10 @@ static void TprConfigure(int card, int minor)
         }
     }
     pCard->mmask |= 1 << minor;
-    pCard->fd[minor] = fd;
+    if (minor == DEVNODE_MINOR_BSA)
+        pCard->fd[minor-1] = fd;
+    else
+        pCard->fd[minor] = fd;
     if (r)
         pCard->r = r;
     if (q)
@@ -209,7 +230,12 @@ static int TprDrvInitialize(void)
         }
     }
 
-    if (generalTimeRegisterEventProvider("tprTimeGet", 2000, (TIMEEVENTFUN) tprTimeGet)) {
+    if (generalTimeRegisterEventProvider("tprGetEventTimestamp", 1000,
+                                         (TIMEEVENTFUN)tprGetEventTimestamp)) {
+        printf("Cannot register TPR time provider?!?\n");
+    }
+    if (generalTimeRegisterEventProvider("tprCurrentTimestamp", 2000,
+                                         (TIMEEVENTFUN)tprCurrentTimestamp)) {
         printf("Cannot register TPR time provider?!?\n");
     }
     return 0;
@@ -307,16 +333,7 @@ long tprRateProc(struct aSubRecord *psub)
         double newv = freq * (double)(*(epicsInt32 *)psub->vala - *(epicsInt32 *)psub->valb) /
                              (double)(*(epicsInt32 *)psub->valc - *(epicsInt32 *)psub->vald);
         double oldv = *(double *)psub->vale;
-        /*
-         * Sigh... it's possible we've caught an extra event, and this will throw our count way off (0.5 Hz).
-         * So, if we're high by only 0.5 Hz or so, just deduct the extra.  (If it's a big diff, we're probably
-         * really changing, so we're off anyway!
-         */
-        if (newv - oldv > 0.4 && newv - oldv < 1.0 && fabs(oldv) > 0.01)
-            *(double *)psub->vale = freq * (double)(*(epicsInt32 *)psub->vala - *(epicsInt32 *)psub->valb - 1) /
-                                           (double)(*(epicsInt32 *)psub->valc - *(epicsInt32 *)psub->vald);
-        else
-            *(double *)psub->vale = newv;
+        *(double *)psub->vale = newv;
     }
     return 0;
 }

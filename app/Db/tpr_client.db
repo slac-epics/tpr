@@ -14,6 +14,14 @@ record(longout, "$(BASE):EVENTNUM")
   field(PINI, "YES")
   field(OMSL, "supervisory")
   field(VAL,  "$(EVT)")
+  field(FLNK, "$(BASE):UPDATE_EVENT")
+}
+
+record(stringout, "$(BASE):UPDATE_EVENT")
+{
+  field(OUT,  "$(BASE):EVENT NPP")
+  field(DOL,  "$(BASE):EVENTNUM NPP")
+  field(OMSL, "closed_loop")
 }
 
 record(event, "$(BASE):EVENT" )

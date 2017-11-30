@@ -43,3 +43,27 @@ record(longin, "$(BASE):FRAMECNT")
   field(INP,  "@$(CARD) -1 - FRAME")
   field(SCAN, "1 second")
 }
+
+record(bi, "$(BASE):LINK")
+{
+  field(DESC, "TPR RX Link Status")
+  field(DTYP, "TPR Master")
+  field(INP,  "@$(CARD) 0 - RXLINK")
+  field(ZNAM, "OFF")
+  field(ONAM, "ON")
+  field(SCAN, "1 second")
+  field(FLNK, "$(BASE):STATUS")
+}
+
+record(mbbi, "$(BASE):STATUS")
+{
+  field(DESC, "TPR Status")
+  field(INP, "$(BASE):LINK NPP MS")
+  field(ZRVL, "0")
+  field(ZRST, "FAIL")
+  field(ZRSV, "MAJOR")
+  field(ONVL, "1")
+  field(ONST, "ON")
+  field(ONSV, "NO_ALARM")
+  field(UNSV, "INVALID")
+}
