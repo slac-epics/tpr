@@ -1,0 +1,1438 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 2134
+y 71
+w 884
+h 972
+font "helvetica-medium-r-18.0"
+ctlFont "helvetica-medium-r-12.0"
+btnFont "helvetica-bold-r-14.0"
+fgColor index 14
+bgColor index 7
+textColor index 14
+ctlFgColor1 index 1
+ctlFgColor2 index 14
+ctlBgColor1 index 25
+ctlBgColor2 index 7
+topShadowColor index 1
+botShadowColor index 14
+title "$(TPR) SLAC pciE TPR"
+showGrid
+snapToGrid
+gridSize 4
+endScreenProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 456
+y 56
+w 280
+h 60
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 0
+y 0
+w 880
+h 40
+lineColor index 56
+fill
+fillColor index 56
+lineWidth 0
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 8
+y 0
+w 256
+h 40
+font "helvetica-medium-r-12.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "SLAC PCIe Pattern Receiver"
+  "$(TPR)"
+}
+endObjectProperties
+
+# (Exit Button)
+object activeExitButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 820
+y 8
+w 48
+h 24
+fgColor index 14
+bgColor index 4
+topShadowColor index 1
+botShadowColor index 11
+label "Exit"
+font "helvetica-medium-r-12.0"
+3d
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 8
+y 56
+w 180
+h 60
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 8
+y 48
+w 48
+h 16
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Info"
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 196
+y 56
+w 252
+h 60
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 196
+y 48
+w 80
+h 16
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "TPR Status"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 200
+y 64
+w 36
+h 20
+font "helvetica-medium-r-10.0"
+fontAlign "right"
+fgColor index 14
+bgColor index 4
+useDisplayBg
+value {
+  "Link"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 244
+y 64
+w 84
+h 20
+controlPv "$(TPR):LINK"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 16
+fgAlarm
+bgColor index 12
+limitsFromDb
+nullColor index 40
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Lines)
+object activeLineClass
+beginObjectProperties
+major 4
+minor 0
+release 1
+x 416
+y 88
+w 24
+h 24
+lineColor index 14
+fill
+fillColor index 15
+fillAlarm
+alarmPv "$(TPR):STATUS"
+numPoints 5
+xPoints {
+  0 428
+  1 416
+  2 428
+  3 440
+  4 428
+}
+yPoints {
+  0 88
+  1 100
+  2 112
+  3 100
+  4 88
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 48
+y 64
+w 136
+h 20
+font "helvetica-medium-r-12.0"
+fgColor index 14
+bgColor index 4
+value {
+  "$(IOC)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 48
+y 92
+w 136
+h 20
+font "helvetica-medium-r-12.0"
+fgColor index 14
+bgColor index 4
+value {
+  "$(TPR)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 16
+y 92
+w 28
+h 20
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 4
+useDisplayBg
+value {
+  "TPR"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 16
+y 64
+w 28
+h 20
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 4
+useDisplayBg
+value {
+  "IOC"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 200
+y 92
+w 36
+h 20
+font "helvetica-medium-r-10.0"
+fontAlign "right"
+fgColor index 14
+bgColor index 4
+useDisplayBg
+value {
+  "Frames"
+}
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 8
+y 132
+w 866
+h 816
+lineColor index 3
+fill
+fillColor index 3
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 664
+y 948
+w 128
+h 20
+controlPv "$(IOC):TOD"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+fgAlarm
+bgColor index 12
+useDisplayBg
+precision 1
+nullColor index 0
+newPos
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 8
+y 124
+w 68
+h 16
+font "helvetica-bold-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Channels"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 16
+y 156
+w 64
+h 16
+font "helvetica-medium-i-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Timing Enab"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 488
+y 140
+w 80
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Req Width(us)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 420
+y 156
+w 52
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Polarity"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 668
+y 156
+w 96
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Fine Del(LCLS2)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 752
+y 140
+w 56
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Event Cnt"
+}
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 172
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=0,L=1,TPR=$(TPR)"
+  1 "CH=0,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 236
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=1,L=1,TPR=$(TPR)"
+  1 "CH=1,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 120
+y 156
+w 68
+h 16
+font "helvetica-medium-i-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Timing Source"
+}
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 300
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=2,L=1,TPR=$(TPR)"
+  1 "CH=2,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 364
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=3,L=1,TPR=$(TPR)"
+  1 "CH=3,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 428
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=4,L=1,TPR=$(TPR)"
+  1 "CH=4,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 492
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=5,L=1,TPR=$(TPR)"
+  1 "CH=5,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 556
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=6,L=1,TPR=$(TPR)"
+  1 "CH=6,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 620
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=7,L=1,TPR=$(TPR)"
+  1 "CH=7,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 684
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=8,L=1,TPR=$(TPR)"
+  1 "CH=8,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 748
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=9,L=1,TPR=$(TPR)"
+  1 "CH=9,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 812
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=A,L=1,TPR=$(TPR)"
+  1 "CH=A,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Embedded Window)
+object activePipClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 12
+y 876
+w 858
+h 64
+fgColor index 14
+bgColor index 0
+topShadowColor index 1
+botShadowColor index 14
+displaySource "menu"
+filePv "LOC\\emb-trig=0"
+sizeOfs 5
+numDsps 2
+displayFileName {
+  0 "tprScreens/emb-trig.edl"
+  1 "tprScreens/emb-trig.edl"
+}
+menuLabel {
+  0 "LCLS I"
+  1 "LCLS II"
+}
+symbols {
+  0 "CH=B,L=1,TPR=$(TPR)"
+  1 "CH=B,L=2,TPR=$(TPR)"
+}
+replaceSymbols {
+  0 1
+}
+propagateMacros {
+  0 0
+  1 0
+}
+noScroll
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 244
+y 92
+w 84
+h 20
+controlPv "$(TPR):FRAMECNT"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 16
+fgAlarm
+bgColor index 12
+limitsFromDb
+nullColor index 40
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 336
+y 92
+w 68
+h 20
+fgColor index 14
+onColor index 4
+offColor index 4
+topShadowColor index 1
+botShadowColor index 14
+controlPv "$(TPR):COUNT_RESET"
+pressValue "Reset"
+onLabel "Reset Count"
+offLabel "Reset Count"
+3d
+font "helvetica-bold-r-10.0"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 336
+y 64
+w 36
+h 20
+font "helvetica-medium-r-10.0"
+fontAlign "right"
+fgColor index 14
+bgColor index 4
+useDisplayBg
+value {
+  "Mode"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 376
+y 64
+w 68
+h 20
+controlPv "$(TPR):TIMING_MODE"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 16
+fgAlarm
+bgColor index 12
+limitsFromDb
+nullColor index 40
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 460
+y 64
+w 80
+h 20
+fgColor index 14
+onColor index 4
+offColor index 4
+topShadowColor index 1
+botShadowColor index 14
+controlPv "LOC\\emb-trig=0"
+pressValue "1"
+releaseValue "0"
+onLabel "LCLS-II"
+offLabel "LCLS-I"
+toggle
+3d
+font "helvetica-bold-r-14.0"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 544
+y 60
+w 181
+h 54
+font "helvetica-medium-r-24.0"
+fontAlign "center"
+fgColor index 20
+bgColor index 25
+useDisplayBg
+visPv "CALC\\\{A==B\}(LOC\\emb-trig,$(TPR):TIMING_MODE.RVAL)"
+visMin "0"
+visMax "1"
+value {
+  "Viewing Inactive"
+  "Configuration!"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 456
+y 48
+w 80
+h 16
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+value {
+  "Config View"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 560
+y 60
+w 159
+h 54
+font "helvetica-medium-r-24.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 25
+useDisplayBg
+visPv "CALC\\\{A==B\}(LOC\\emb-trig,$(TPR):TIMING_MODE.RVAL)"
+visMin "1"
+visMax "2"
+value {
+  "Viewing active"
+  "Configuration"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 16
+y 140
+w 60
+h 16
+font "helvetica-medium-i-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Channel#"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 228
+y 140
+w 60
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Seq Bit or"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 296
+y 140
+w 48
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Beam or"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 576
+y 140
+w 84
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Req Delay(us)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 416
+y 140
+w 64
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Trig Enab"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 352
+y 140
+w 64
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "BSA Enab"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 668
+y 140
+w 68
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Delay Ticks"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 824
+y 140
+w 40
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Rate"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 120
+y 140
+w 64
+h 16
+font "helvetica-medium-i-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Description"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 228
+y 156
+w 60
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "AC Phase"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 288
+y 156
+w 64
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Other Dest"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 488
+y 156
+w 80
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Act Width(us)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 576
+y 156
+w 84
+h 16
+font "helvetica-medium-i-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "Act Delay(us)"
+}
+endObjectProperties
+

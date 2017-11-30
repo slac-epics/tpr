@@ -1,0 +1,264 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 650
+y 273
+w 262
+h 88
+font "helvetica-medium-r-18.0"
+ctlFont "helvetica-medium-r-12.0"
+btnFont "helvetica-bold-r-14.0"
+fgColor index 14
+bgColor index 7
+textColor index 14
+ctlFgColor1 index 1
+ctlFgColor2 index 14
+ctlBgColor1 index 25
+ctlBgColor2 index 7
+topShadowColor index 1
+botShadowColor index 14
+title "$(TPR) LCLS$(L) $(CH) Destination"
+showGrid
+snapToGrid
+gridSize 4
+endScreenProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 4
+y 28
+w 156
+h 24
+font "helvetica-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 5
+value {
+  "Channel $(CH) Destination"
+}
+endObjectProperties
+
+# (Menu Button)
+object activeMenuButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 4
+y 56
+w 156
+h 24
+fgColor index 14
+fgAlarm
+bgColor index 4
+inconsistentColor index 7
+topShadowColor index 1
+botShadowColor index 14
+controlPv "$(TPR):LCLS$(L):CH$(CH):DEST_MODE"
+indicatorPv "$(TPR):LCLS$(L):CH$(CH):DEST_MODE"
+font "helvetica-bold-r-14.0"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 664
+y 36
+w 72
+h 24
+controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_FINE_DELAY"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 16
+fgAlarm
+bgColor index 12
+limitsFromDb
+nullColor index 40
+smartRefresh
+useHexPrefix
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 660
+y 32
+w 76
+h 28
+lineColor index 7
+fill
+fillColor index 7
+visPv "$(TPR):LCLS$(L):CH$(CH):TRIG_FINE_DELAY.DISA"
+visMin "1"
+visMax "2"
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 168
+y 4
+w 28
+h 16
+fgColor index 14
+onColor index 15
+offColor index 20
+inconsistentColor index 7
+topShadowColor index 1
+botShadowColor index 14
+controlPv "$(TPR):LCLS$(L):CH$(CH):DEST0"
+indicatorPv "$(TPR):LCLS$(L):CH$(CH):DEST0"
+onLabel "On"
+offLabel "Off"
+3d
+font "helvetica-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 200
+y 4
+w 61
+h 14
+font "helvetica-medium-r-12.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "D10Dump"
+}
+autoSize
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 168
+y 24
+w 28
+h 16
+fgColor index 14
+onColor index 15
+offColor index 20
+inconsistentColor index 7
+topShadowColor index 1
+botShadowColor index 14
+controlPv "$(TPR):LCLS$(L):CH$(CH):DEST1"
+indicatorPv "$(TPR):LCLS$(L):CH$(CH):DEST1"
+onLabel "On"
+offLabel "Off"
+3d
+font "helvetica-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 200
+y 24
+w 37
+h 14
+font "helvetica-medium-r-12.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "LI25"
+}
+autoSize
+endObjectProperties
+
+# (Button)
+object activeButtonClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 168
+y 44
+w 28
+h 16
+fgColor index 14
+onColor index 15
+offColor index 20
+inconsistentColor index 7
+topShadowColor index 1
+botShadowColor index 14
+controlPv "$(TPR):LCLS$(L):CH$(CH):DEST2"
+indicatorPv "$(TPR):LCLS$(L):CH$(CH):DEST2"
+onLabel "On"
+offLabel "Off"
+3d
+font "helvetica-bold-r-12.0"
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 200
+y 44
+w 25
+h 14
+font "helvetica-medium-r-12.0"
+fgColor index 14
+bgColor index 3
+useDisplayBg
+value {
+  "UND"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 4
+y 4
+w 156
+h 24
+font "helvetica-bold-r-10.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 5
+value {
+  "$(TPR) LCLS-$(L)"
+}
+endObjectProperties
+
