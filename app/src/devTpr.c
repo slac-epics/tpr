@@ -128,7 +128,7 @@ int tprGetConfig(tprCardStruct *pCard, int chan, int reg)
     case 0x100:
         return pCard->config.lcls[pCard->config.mode][chan].boRecord[reg & 255]->val;
     case 0x200:
-        return pCard->config.lcls[pCard->config.mode][chan].mbboRecord[reg & 255]->val;
+        return pCard->config.lcls[pCard->config.mode][chan].mbboRecord[reg & 255]->rval;
     case 0x300:
         return pCard->config.lcls[pCard->config.mode][chan].mbboDirectRecord[reg & 255]->val;
     case 0x400:
@@ -326,7 +326,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
  *    dpvt->lcls >= 0                  --> Not universal (LCLS-I or LCLS-II, not both).
  *    dpvt->lcls != pCard->config.mode --> This is for the "other" set of values.
  */
-#define PROCDECL(TYPE)                                                        \
+#define PROCDECL(TYPE, FIELD)                                                 \
     static epicsStatus tprProc##TYPE(TYPE *pRec)                              \
     {                                                                         \
         struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;            \
@@ -334,7 +334,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         int mode = pCard->config.mode;                                        \
         if ((dpvt->lcls != -2) && (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))) \
             return 0;                                                         \
-        if (tprWrite(pCard, dpvt->idx, dpvt->chan, pRec->val))                \
+        if (tprWrite(pCard, dpvt->idx, dpvt->chan, pRec->FIELD))              \
             scanIoRequest(pCard->config.lcls[mode][dpvt->chan].ioscan);       \
         return 0;                                                             \
     }
@@ -374,10 +374,10 @@ INITDECL(longoutRecord, out)
 INITDECL(longinRecord, inp)
 INITDECL(biRecord, inp)
 
-PROCDECL(boRecord)
-PROCDECL(mbboRecord)
-PROCDECL(mbboDirectRecord)
-PROCDECL(longoutRecord)
+PROCDECL(boRecord,val)
+PROCDECL(mbboRecord,rval)
+PROCDECL(mbboDirectRecord,val)
+PROCDECL(longoutRecord,val)
 
 DSETDECL(boRecord)
 DSETDECL(mbboRecord)
