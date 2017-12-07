@@ -31,8 +31,7 @@
 static tprCardStruct *tprCards[MAX_TPR] = { NULL };
 int tprDebug = 0;
 
-extern int tprCurrentTimestamp(epicsTimeStamp *epicsTime_ps, int eventCode);
-extern int tprGetEventTimestamp(epicsTimeStamp *epicsTime_ps, int eventCode);
+extern int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode);
 extern void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message);
 
 static int tprIrqHandlerThread(void *p)
@@ -231,11 +230,11 @@ static int TprDrvInitialize(void)
     }
 
     if (generalTimeRegisterEventProvider("tprGetEventTimestamp", 1000,
-                                         (TIMEEVENTFUN)tprGetEventTimestamp)) {
+                                         (TIMEEVENTFUN)timingGetEventTimeStamp)) {
         printf("Cannot register TPR time provider?!?\n");
     }
-    if (generalTimeRegisterEventProvider("tprCurrentTimestamp", 2000,
-                                         (TIMEEVENTFUN)tprCurrentTimestamp)) {
+    if (generalTimeRegisterEventProvider("tprCurrentTimeStamp", 2000,
+                                         (TIMEEVENTFUN)tprCurrentTimeStamp)) {
         printf("Cannot register TPR time provider?!?\n");
     }
     return 0;
@@ -332,7 +331,7 @@ long tprRateProc(struct aSubRecord *psub)
     else {
         double newv = freq * (double)(*(epicsInt32 *)psub->vala - *(epicsInt32 *)psub->valb) /
                              (double)(*(epicsInt32 *)psub->valc - *(epicsInt32 *)psub->vald);
-        double oldv = *(double *)psub->vale;
+        /* double oldv = *(double *)psub->vale; */
         *(double *)psub->vale = newv;
     }
     return 0;

@@ -25,6 +25,8 @@ typedef struct fifoInfoStruct {
     long long		fifo_tsc;
 } fifoInfo;
 
+#define	TIMING_EVENT_CUR_FID	1
+
 #define MAX_TS_QUEUE           512
 #define MAX_TS_QUEUE_MASK      511
 #define MAX_EVENT 256
@@ -141,6 +143,7 @@ static epicsStatus tprProceventRecord(eventRecord *pRec)
         return 1;
     }
     if (dpvt->idx == EVT) {
+		/* TODO: This doesn't look threadsafe for 32bit cpus.  Same for other record Proc routines */
 		fifoInfo	*	pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
         pRec->time.nsec = pFifoInfo->event.nanosecs;
@@ -245,24 +248,61 @@ static dsetStruct devTprCeventRecord = {
 };
 epicsExportAddress (dset, devTprCeventRecord);
 
-int tprCurrentTimestamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
 {
+#if 1
+	/* TODO: This doesn't look threadsafe for anyone.  */
     epicsTime_ps->secPastEpoch = lastTimeStamp.secPastEpoch;
     epicsTime_ps->nsec         = lastTimeStamp.nsec;
     return epicsTimeOK;
+#else
+	return timingGetEventTimeStamp(epicsTime_ps, TIMING_EVENT_CUR_FID );
+#endif
 }
 
-int tprGetEventTimestamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+/* timingGetCurTimeStamp() needed to support timingFifoApi */
+int timingGetCurTimeStamp(  epicsTimeStamp  *   pTimeStampDest )
 {
+	return tprCurrentTimeStamp( pTimeStampDest, TIMING_EVENT_CUR_FID );
+}
+
+/* timingGetEventTimeStamp() needed to support timingFifoApi */
+int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+{
+#if 1
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
     } else {
+		/* TODO: This doesn't look threadsafe for 32bit cpus.  */
         fifoInfo    *pFifoInfo     = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
         epicsTime_ps->secPastEpoch = pFifoInfo->event.seconds;
         epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
         return epicsTimeOK;
     }
+#else
+    int                     status  = 0; 
+    unsigned long long      idx     =   0LL;
+    timingFifoInfo          fifoInfo;
+
+    if ( epicsTime_ps == NULL )
+        return -1;
+
+    status = timingGetFifoInfo( eventCode, TS_INDEX_INIT, &idx, &fifoInfo );
+    if ( status < 0 )
+    {
+        epicsTime_ps->secPastEpoch = 0;
+        epicsTime_ps->nsec         = PULSEID_INVALID;
+    }
+    else
+    {
+        epicsTime_ps->secPastEpoch = fifoInfo.fifo_time.secPastEpoch;
+        epicsTime_ps->nsec         = fifoInfo.fifo_time.nsec;
+    }
+
+    return status;
+#endif
 }
+
 
 void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
 {
@@ -386,6 +426,7 @@ int timingGetFifoInfo(
     fifoInfo    *pFifoInfo;
     if (!pFifoInfoDest || !idx || eventCode >= MAX_EVENT)
         return epicsTimeERROR;
+	/* TODO: 64 bit ti[eventCode].idx access isn't threadsafe for 32bit cpus.  */
     if (incr == TS_INDEX_INIT)
         *idx = ti[eventCode].idx - 1;
     else
@@ -407,3 +448,10 @@ timingPulseId timingGetLastFiducial( )
     else
         return lastfid;
 }
+
+/* TODO: Add support for this timingFifoApi function */
+extern timingPulseId timingGetFiducialForTimeStamp( epicsTimeStamp timeStamp )
+{
+	return TIMING_PULSEID_INVALID;
+}
+
