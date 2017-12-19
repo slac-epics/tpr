@@ -21,11 +21,11 @@ static BsaTimingCallback        gpBsaTimingCallback   = NULL;
 static void                    *gpBsaTimingUserPvt    = NULL;
 
 typedef struct fifoInfoStruct {
-    tprEvent		event;
-    long long		fifo_tsc;
+    tprEvent        event;
+    long long       fifo_tsc;
 } fifoInfo;
 
-#define	TIMING_EVENT_CUR_FID	1
+#define TIMING_EVENT_CUR_FID    1
 
 #define MAX_TS_QUEUE           512
 #define MAX_TS_QUEUE_MASK      511
@@ -143,8 +143,8 @@ static epicsStatus tprProceventRecord(eventRecord *pRec)
         return 1;
     }
     if (dpvt->idx == EVT) {
-		/* TODO: This doesn't look threadsafe for 32bit cpus.  Same for other record Proc routines */
-		fifoInfo	*	pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
+        /* TODO: This doesn't look threadsafe for 32bit cpus.  Same for other record Proc routines */
+        fifoInfo    *   pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
         pRec->time.nsec = pFifoInfo->event.nanosecs;
     } else
@@ -160,7 +160,7 @@ static epicsStatus tprProcwaveformRecord(waveformRecord *pRec)
     if (evt < 0 || evt >= MAX_EVENT || !ti[evt].idx)
         return 1;
     if (dpvt->idx == MESSAGE) {
-        fifoInfo	*	pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
+        fifoInfo    *   pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         memcpy(pRec->bptr, &pFifoInfo->event, sizeof(tprEvent));
         pRec->nord = sizeof(tprEvent) / sizeof(u32);
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
@@ -175,7 +175,7 @@ static epicsStatus tprProclonginRecord(longinRecord *pRec)
     struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
     tprCardStruct *pCard = dpvt->pCard;
     int evt = pCard->client[dpvt->chan].longoutRecord[0]->val;
-	fifoInfo	*	pFifoInfo;
+    fifoInfo    *   pFifoInfo;
     if (evt < 0 || evt >= MAX_EVENT)
         return 1;
     if (!ti[evt].idx)
@@ -200,7 +200,7 @@ static epicsStatus tprProcbiRecord(biRecord *pRec)
 {
     struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
     tprCardStruct *pCard = dpvt->pCard;
-	fifoInfo	*	pFifoInfo;
+    fifoInfo    *   pFifoInfo;
     int evt = pCard->client[dpvt->chan].longoutRecord[0]->val;
     if (evt < 0 || evt >= MAX_EVENT)
         return 1;
@@ -250,7 +250,7 @@ epicsExportAddress (dset, devTprCeventRecord);
 
 int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
 {
-	/* TODO: This doesn't look threadsafe for anyone.  */
+    /* TODO: This doesn't look threadsafe for anyone.  */
     epicsTime_ps->secPastEpoch = lastTimeStamp.secPastEpoch;
     epicsTime_ps->nsec         = lastTimeStamp.nsec;
     return epicsTimeOK;
@@ -259,7 +259,7 @@ int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
 /* timingGetCurTimeStamp() needed to support timingFifoApi */
 int timingGetCurTimeStamp(  epicsTimeStamp  *   pTimeStampDest )
 {
-	return tprCurrentTimeStamp( pTimeStampDest, TIMING_EVENT_CUR_FID );
+    return tprCurrentTimeStamp( pTimeStampDest, TIMING_EVENT_CUR_FID );
 }
 
 /* timingGetEventTimeStamp() needed to support timingFifoApi */
@@ -268,7 +268,7 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
     } else {
-		/* TODO: This doesn't look threadsafe for 32bit cpus.  */
+        /* TODO: This doesn't look threadsafe for 32bit cpus.  */
         fifoInfo    *pFifoInfo     = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
         epicsTime_ps->secPastEpoch = pFifoInfo->event.seconds;
         epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
@@ -399,7 +399,7 @@ int timingGetFifoInfo(
     fifoInfo    *pFifoInfo;
     if (!pFifoInfoDest || !idx || eventCode >= MAX_EVENT)
         return epicsTimeERROR;
-	/* TODO: 64 bit ti[eventCode].idx access isn't threadsafe for 32bit cpus.  */
+    /* TODO: 64 bit ti[eventCode].idx access isn't threadsafe for 32bit cpus.  */
     if (incr == TS_INDEX_INIT)
         *idx = ti[eventCode].idx - 1;
     else
@@ -416,12 +416,12 @@ int timingGetFifoInfo(
 
 timingPulseId timingGetLastFiducial( )
 {
-	return lastfid;
+    return lastfid;
 }
 
 /* TODO: Add support for this timingFifoApi function */
 extern timingPulseId timingGetFiducialForTimeStamp( epicsTimeStamp timeStamp )
 {
-	return TIMING_PULSEID_INVALID;
+    return TIMING_PULSEID_INVALID;
 }
 
