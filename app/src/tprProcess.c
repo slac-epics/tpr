@@ -443,10 +443,7 @@ int timingGetFifoInfo(
 
 timingPulseId timingGetLastFiducial( )
 {
-    if (lastfid == 0x1ffff)
-        return TIMING_PULSEID_INVALID;   /* Convert old LCLS1 invalid to new! */
-    else
-        return lastfid;
+	return lastfid;
 }
 
 /* TODO: Add support for this timingFifoApi function */
