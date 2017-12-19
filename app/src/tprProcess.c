@@ -1,3 +1,4 @@
+#include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -142,7 +143,7 @@ static epicsStatus tprProceventRecord(eventRecord *pRec)
         return 1;
     }
     if (dpvt->idx == EVT) {
-        fifoInfo	*pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
+        fifoInfo * pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
         pRec->time.nsec = pFifoInfo->event.nanosecs;
     } else
@@ -158,7 +159,7 @@ static epicsStatus tprProcwaveformRecord(waveformRecord *pRec)
     if (evt < 0 || evt >= MAX_EVENT || !ti[evt].idx)
         return 1;
     if (dpvt->idx == MESSAGE) {
-        fifoInfo	*pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
+        fifoInfo * pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         memcpy(pRec->bptr, &pFifoInfo->event, sizeof(tprEvent));
         pRec->nord = sizeof(tprEvent) / sizeof(u32);
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
@@ -269,7 +270,7 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
     } else {
-        fifoInfo    *pFifoInfo     = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
+        fifoInfo    * pFifoInfo    = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
         epicsTime_ps->secPastEpoch = pFifoInfo->event.seconds;
         epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
         return epicsTimeOK;
@@ -437,6 +438,15 @@ TimingPulseId timingGetLastFiducial()
         return pulseID;
 }
 
+inline double epicsTimeStamp2Double( const epicsTimeStamp * pts )
+{
+    assert( pts != NULL );
+    return( (double) pts->secPastEpoch + (double) pts->nsec * 1e-9 );
+}
+
+const double    lcls1PulseRate      = 360.0;
+const double    lcls2PulseRate      = 1.3e9 / 7 / 200;
+
 TimingPulseId timingGetFiducialForTimeStamp(epicsTimeStamp timeStamp)
 {
     int i = (allTimingInfoIdx-1) & MAX_ALLTS_QUEUE_MASK;
@@ -452,12 +462,24 @@ TimingPulseId timingGetFiducialForTimeStamp(epicsTimeStamp timeStamp)
         if (allTimingInfo[i].fifo_time.secPastEpoch > timeStamp.secPastEpoch ||
             (allTimingInfo[i].fifo_time.secPastEpoch == timeStamp.secPastEpoch &&
              allTimingInfo[i].fifo_time.nsec > timeStamp.nsec))
-            return TIMING_PULSEID_INVALID;
+            break;
         /* Go back one, rolling around if necessary. */
         if (--i < 0)
             i = MAX_ALLTS_QUEUE - 1;
     }
-    return TIMING_PULSEID_INVALID;
+
+    /* If not in queue, estimate based on prior timingFifoInfo */
+    double              pulseInterval;
+    tprCardStruct   *   pCard = tprGetCard(0);                                             \
+    if ( pCard != NULL && pCard->config.mode == 0 )
+        pulseInterval   = 1.0L / lcls1PulseRate;
+    else
+        pulseInterval   = 1.0L / lcls2PulseRate;
+    EventTimingData *   pInfo   = &allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK];
+    double              tsNow   = epicsTimeStamp2Double( &pInfo->fifo_time );
+    double              tsTgt   = epicsTimeStamp2Double( &timeStamp );
+    double              fidDelta= (tsNow - tsTgt) / pulseInterval;
+    return( pInfo->fifo_fid - llround( fidDelta ) );
 }
 
 void timingPrintNow(int e)
