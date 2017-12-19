@@ -250,14 +250,10 @@ epicsExportAddress (dset, devTprCeventRecord);
 
 int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
 {
-#if 1
 	/* TODO: This doesn't look threadsafe for anyone.  */
     epicsTime_ps->secPastEpoch = lastTimeStamp.secPastEpoch;
     epicsTime_ps->nsec         = lastTimeStamp.nsec;
     return epicsTimeOK;
-#else
-	return timingGetEventTimeStamp(epicsTime_ps, TIMING_EVENT_CUR_FID );
-#endif
 }
 
 /* timingGetCurTimeStamp() needed to support timingFifoApi */
@@ -269,7 +265,6 @@ int timingGetCurTimeStamp(  epicsTimeStamp  *   pTimeStampDest )
 /* timingGetEventTimeStamp() needed to support timingFifoApi */
 int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
 {
-#if 1
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
     } else {
@@ -279,28 +274,6 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode
         epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
         return epicsTimeOK;
     }
-#else
-    int                     status  = 0; 
-    unsigned long long      idx     =   0LL;
-    timingFifoInfo          fifoInfo;
-
-    if ( epicsTime_ps == NULL )
-        return -1;
-
-    status = timingGetFifoInfo( eventCode, TS_INDEX_INIT, &idx, &fifoInfo );
-    if ( status < 0 )
-    {
-        epicsTime_ps->secPastEpoch = 0;
-        epicsTime_ps->nsec         = PULSEID_INVALID;
-    }
-    else
-    {
-        epicsTime_ps->secPastEpoch = fifoInfo.fifo_time.secPastEpoch;
-        epicsTime_ps->nsec         = fifoInfo.fifo_time.nsec;
-    }
-
-    return status;
-#endif
 }
 
 
