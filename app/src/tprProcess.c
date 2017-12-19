@@ -15,7 +15,8 @@
 #include"bsaCallbackApi.h"
 
 static timingPulseId    lastfid = 0;
-static epicsTimeStamp   lastTimeStamp;
+static timingFifoInfo   lastTimingInfo[2];
+static int              lastTimingInfoIdx = 0;
 
 static BsaTimingCallback        gpBsaTimingCallback   = NULL;
 static void                    *gpBsaTimingUserPvt    = NULL;
@@ -24,8 +25,6 @@ typedef struct fifoInfoStruct {
     tprEvent        event;
     long long       fifo_tsc;
 } fifoInfo;
-
-#define TIMING_EVENT_CUR_FID    1
 
 #define MAX_TS_QUEUE           512
 #define MAX_TS_QUEUE_MASK      511
@@ -248,32 +247,37 @@ static dsetStruct devTprCeventRecord = {
 };
 epicsExportAddress (dset, devTprCeventRecord);
 
-int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
 {
-    /* TODO: This doesn't look threadsafe for anyone.  */
-    epicsTime_ps->secPastEpoch = lastTimeStamp.secPastEpoch;
-    epicsTime_ps->nsec         = lastTimeStamp.nsec;
+    timingFifoInfo  *   pInfo   = &lastTimingInfo[lastTimingInfoIdx&1];
+    epicsTime_ps->secPastEpoch  = pInfo->fifo_time.secPastEpoch;
+    epicsTime_ps->nsec          = pInfo->fifo_time.nsec;
     return epicsTimeOK;
 }
 
 /* timingGetCurTimeStamp() needed to support timingFifoApi */
 int timingGetCurTimeStamp(  epicsTimeStamp  *   pTimeStampDest )
 {
-    return tprCurrentTimeStamp( pTimeStampDest, TIMING_EVENT_CUR_FID );
+    return tprCurrentTimeStamp( pTimeStampDest, 0 );
 }
 
 /* timingGetEventTimeStamp() needed to support timingFifoApi */
-int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
 {
-    if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
-        return epicsTimeERROR;
-    } else {
-        /* TODO: This doesn't look threadsafe for 32bit cpus.  */
-        fifoInfo    *pFifoInfo     = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
-        epicsTime_ps->secPastEpoch = pFifoInfo->event.seconds;
-        epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
+    if (eventCode <= 0) {
+        tprCurrentTimeStamp( epicsTime_ps, eventCode );
         return epicsTimeOK;
     }
+    if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
+        return epicsTimeERROR;
+    }
+
+    /* TODO: This doesn't look threadsafe for 32bit cpus.  */
+    long long       msgIndex    = ti[eventCode].idx - 1;
+    fifoInfo    *   pFifoInfo   = &ti[eventCode].message[msgIndex & MAX_TS_QUEUE_MASK];
+    epicsTime_ps->secPastEpoch  = pFifoInfo->event.seconds;
+    epicsTime_ps->nsec          = pFifoInfo->event.nanosecs;
+    return epicsTimeOK;
 }
 
 
@@ -285,17 +289,25 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
     switch (message->tag & TAG_TYPE_MASK) {
     case TAG_EVENT: {
         tprEvent *e = (tprEvent *)message;
+        /* Save the latest timing info */
         if (e->pulseID > lastfid) {
             lastfid = e->pulseID;
-            lastTimeStamp.secPastEpoch    = e->seconds;
-            lastTimeStamp.nsec        = e->nanosecs;
+            timingFifoInfo  *   pTimingFifoInfo     = &lastTimingInfo[(++lastTimingInfoIdx)&1];
+            pTimingFifoInfo->fifo_tsc               = GetHiResTicks();
+            pTimingFifoInfo->fifo_fid               = e->pulseID;
+            pTimingFifoInfo->fifo_time.secPastEpoch = e->seconds;
+            pTimingFifoInfo->fifo_time.nsec         = e->nanosecs;
         }
+
+        /* Add timing info for this event to it's fifo */
         int evt = pCard->client[chan].longoutRecord[0]->val;
         if (evt < 0 || evt >= MAX_EVENT)
             return;
         fifoInfo *pFifoInfo = &ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK];
         pFifoInfo->fifo_tsc = GetHiResTicks();
         memcpy(&pFifoInfo->event, e, sizeof(tprEvent));
+
+        /* Generate the approprite ioscan for this channel */
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
         scanIoRequest(pCard->client[chan].ioscan);
         break;
