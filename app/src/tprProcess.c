@@ -268,14 +268,12 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
     }
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
+    } else {
+        fifoInfo    *pFifoInfo     = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
+        epicsTime_ps->secPastEpoch = pFifoInfo->event.seconds;
+        epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
+        return epicsTimeOK;
     }
-
-    /* TODO: This doesn't look threadsafe for 32bit cpus.  */
-    long long       msgIndex    = ti[eventCode].idx - 1;
-    fifoInfo    *   pFifoInfo   = &ti[eventCode].message[msgIndex & MAX_TS_QUEUE_MASK];
-    epicsTime_ps->secPastEpoch  = pFifoInfo->event.seconds;
-    epicsTime_ps->nsec          = pFifoInfo->event.nanosecs;
-    return epicsTimeOK;
 }
 
 
@@ -310,10 +308,8 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
         fifoInfo *pFifoInfo = &ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK];
         pFifoInfo->fifo_tsc = tsc;
         memcpy(&pFifoInfo->event, e, sizeof(tprEvent));
-
-        /* Generate the approprite ioscan for this channel */
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
-        /* Generate the approprite ioscan for this channel */
+        /* Generate the appropriate ioscan for this channel */
         scanIoRequest(pCard->client[chan].ioscan);
         break;
     }
@@ -418,7 +414,6 @@ int timingGetFifoInfo(
     fifoInfo    *pFifoInfo;
     if (!pFifoInfoDest || !idx || eventCode >= MAX_EVENT)
         return epicsTimeERROR;
-    /* TODO: 64 bit ti[eventCode].idx access isn't threadsafe for 32bit cpus.  */
     if (incr == TS_INDEX_INIT)
         *idx = ti[eventCode].idx - 1;
     else
@@ -442,7 +437,6 @@ TimingPulseId timingGetLastFiducial()
         return pulseID;
 }
 
-/* TODO: Add support for this timingFifoApi function */
 TimingPulseId timingGetFiducialForTimeStamp(epicsTimeStamp timeStamp)
 {
     int i = (allTimingInfoIdx-1) & MAX_ALLTS_QUEUE_MASK;
