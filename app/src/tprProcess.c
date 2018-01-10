@@ -18,8 +18,8 @@ static BsaTimingCallback        gpBsaTimingCallback   = NULL;
 static void                    *gpBsaTimingUserPvt    = NULL;
 
 typedef struct fifoInfoStruct {
-    tprEvent		event;
-    long long		fifo_tsc;
+    tprEvent        event;
+    long long       fifo_tsc;
 } fifoInfo;
 
 #define MAX_TS_QUEUE           512
@@ -173,7 +173,7 @@ static epicsStatus tprProclonginRecord(longinRecord *pRec)
     struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
     tprCardStruct *pCard = dpvt->pCard;
     int evt = pCard->client[dpvt->chan].longoutRecord[0]->val;
-	fifoInfo	*	pFifoInfo;
+    fifoInfo    *   pFifoInfo;
     if (evt < 0 || evt >= MAX_EVENT)
         return 1;
     if (!ti[evt].idx)
@@ -198,7 +198,7 @@ static epicsStatus tprProcbiRecord(biRecord *pRec)
 {
     struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;
     tprCardStruct *pCard = dpvt->pCard;
-	fifoInfo	*	pFifoInfo;
+    fifoInfo    *   pFifoInfo;
     int evt = pCard->client[dpvt->chan].longoutRecord[0]->val;
     if (evt < 0 || evt >= MAX_EVENT)
         return 1;
@@ -268,13 +268,16 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
     }
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
-    } else {
-        fifoInfo    *pFifoInfo     = &ti[eventCode].message[(ti[eventCode].idx-1) & MAX_TS_QUEUE_MASK];
-        epicsTime_ps->secPastEpoch = pFifoInfo->event.seconds;
-        epicsTime_ps->nsec         = pFifoInfo->event.nanosecs;
-        return epicsTimeOK;
     }
+
+    /* TODO: This doesn't look threadsafe for 32bit cpus.  */
+    long long       msgIndex    = ti[eventCode].idx - 1;
+    fifoInfo    *   pFifoInfo   = &ti[eventCode].message[msgIndex & MAX_TS_QUEUE_MASK];
+    epicsTime_ps->secPastEpoch  = pFifoInfo->event.seconds;
+    epicsTime_ps->nsec          = pFifoInfo->event.nanosecs;
+    return epicsTimeOK;
 }
+
 
 void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
 {
@@ -307,6 +310,8 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
         fifoInfo *pFifoInfo = &ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK];
         pFifoInfo->fifo_tsc = tsc;
         memcpy(&pFifoInfo->event, e, sizeof(tprEvent));
+
+        /* Generate the approprite ioscan for this channel */
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
         /* Generate the approprite ioscan for this channel */
         scanIoRequest(pCard->client[chan].ioscan);
@@ -413,6 +418,7 @@ int timingGetFifoInfo(
     fifoInfo    *pFifoInfo;
     if (!pFifoInfoDest || !idx || eventCode >= MAX_EVENT)
         return epicsTimeERROR;
+    /* TODO: 64 bit ti[eventCode].idx access isn't threadsafe for 32bit cpus.  */
     if (incr == TS_INDEX_INIT)
         *idx = ti[eventCode].idx - 1;
     else
