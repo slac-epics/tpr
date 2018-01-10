@@ -432,10 +432,14 @@ int timingGetFifoInfo(
 TimingPulseId timingGetLastFiducial()
 {
     TimingPulseId pulseID = allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK].fifo_fid;
-    if (pulseID == 0x1ffff)
-        return TIMING_PULSEID_INVALID;   /* Convert old LCLS1 invalid to new! */
-    else
-        return pulseID;
+    if (pulseID == 0x1ffff) {
+        /* See if we're in LCLS1 mode */
+        tprCardStruct   *   pCard = tprGetCard(0);
+        if ( pCard != NULL && pCard->config.mode == 0 )
+            /* In LCLS1 mode, convert old LCLS1 invalid to new! */
+            return TIMING_PULSEID_INVALID;
+    }
+    return pulseID;
 }
 
 inline double epicsTimeStamp2Double( const epicsTimeStamp * pts )
@@ -470,7 +474,7 @@ TimingPulseId timingGetFiducialForTimeStamp(epicsTimeStamp timeStamp)
 
     /* If not in queue, estimate based on prior timingFifoInfo */
     double              pulseInterval;
-    tprCardStruct   *   pCard = tprGetCard(0);                                             \
+    tprCardStruct   *   pCard = tprGetCard(0);
     if ( pCard != NULL && pCard->config.mode == 0 )
         pulseInterval   = 1.0L / lcls1PulseRate;
     else
