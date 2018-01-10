@@ -13,7 +13,7 @@
 
 # ==========================================================
 # Define the version strings for all needed modules
-#TIMING_API_MODULE_VERSION	= R0.4
+TIMING_API_MODULE_VERSION	= R0.6
 DIAG_TIMER_MODULE_VERSION	= R1.9.0
 
 # ==========================================================
@@ -30,7 +30,7 @@ DIAG_TIMER_MODULE_VERSION	= R1.9.0
 # If your build fails, look for these paths in your build output
 # ==========================================================
 DIAG_TIMER	= $(EPICS_MODULES)/diagTimer/$(DIAG_TIMER_MODULE_VERSION)
-#TIMING_API	= $(EPICS_MODULES)/timingApi/$(TIMING_API_MODULE_VERSION)
+TIMING_API	= $(EPICS_MODULES)/timingApi/$(TIMING_API_MODULE_VERSION)
 
 # Set EPICS_BASE last so it appears last in the DB, DBD, INCLUDE, and LIB search paths
 EPICS_BASE = $(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
@@ -40,5 +40,5 @@ EPICS_BASE = $(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 
 #MY_MODULES=/reg/neh/home4/mcbrowne/trunk12/modules
 #MY_MODULES=/afs/slac/u/ey/bhill/git-wa/modules
-MY_MODULES=/reg/neh/home4/mcbrowne/git/modules
-TIMING_API	= $(MY_MODULES)/timingApi
+#MY_MODULES=/reg/neh/home4/mcbrowne/git/modules
+#TIMING_API	= $(MY_MODULES)/timingApi-git
