@@ -36,7 +36,7 @@ static struct timeInfo {
 
 #define MAX_ALLTS_QUEUE           2048
 #define MAX_ALLTS_QUEUE_MASK      2047
-static EventTimingData   allTimingInfo[MAX_ALLTS_QUEUE];
+static EventTimingData  allTimingInfo[MAX_ALLTS_QUEUE];
 static long long        allTimingInfoIdx = 0;
 
 struct dpvtStruct {
@@ -46,7 +46,7 @@ struct dpvtStruct {
     int            idx;
 };
 
-static struct BsaTimingData pattern = {
+static BsaTimingData pattern = {
     0LL,
     {0, 0},
     0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL
@@ -485,14 +485,15 @@ TimingPulseId timingGetFiducialForTimeStamp(epicsTimeStamp timeStamp)
 void timingPrintNow(int e)
 {
     EventTimingData  *pInfo      = &allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK];
-    printf("0x%lx: %08x.%08x\n", pInfo->fifo_fid, pInfo->fifo_time.secPastEpoch, pInfo->fifo_time.nsec);
+    printf("0x%llx: %08x.%08x\n", (long long unsigned int) pInfo->fifo_fid, pInfo->fifo_time.secPastEpoch, pInfo->fifo_time.nsec);
     if (e >= 0) {
         int i;
         long long l = ti[e].idx;
         printf("Event %d --> index %lld & MASK = %lld\n", e, l - 1, (l - 1) & MAX_TS_QUEUE_MASK);
         for (i = 1; i <= 3; i++) {
             fifoInfo    *p = &ti[e].message[(l - i) & MAX_TS_QUEUE_MASK];
-            printf("%8d: 0x%lx: %08x.%08x (%lld)\n", (int)((l - i) & MAX_TS_QUEUE_MASK), p->event.pulseID, p->event.seconds, p->event.nanosecs, p->fifo_tsc);
+            printf("%8d: 0x%llx: %08x.%08x (%lld)\n", (int)((l - i) & MAX_TS_QUEUE_MASK),
+                    (long long unsigned int) p->event.pulseID, p->event.seconds, p->event.nanosecs, p->fifo_tsc);
         }
     }
 }
