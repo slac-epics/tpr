@@ -169,6 +169,8 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
             if (tprDebug & TPR_DEBUG_WRITE) printf("i=%d\n", i);
             WDEBUG(channel[i].control, 0);
             pCard->r->channel[i].control = 0;
+            WDEBUG(trigger[i].control, i);
+            pCard->r->trigger[i].control = i;
         }
         pCard->config.mode = value;      /* Switch modes */
         csr = pCard->r->CSR;
@@ -212,6 +214,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
             value = pCard->r->trigger[chan].control | 0x80000000;
         else
             value = pCard->r->trigger[chan].control & 0x7fffffff;
+        value |= chan;
         WDEBUG(trigger[chan].control, value);
         pCard->r->trigger[chan].control = value;
         return 1;
@@ -220,6 +223,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
             value = pCard->r->trigger[chan].control | 0x00010000;
         else
             value = pCard->r->trigger[chan].control & 0xfffeffff;
+        value |= chan;
         WDEBUG(trigger[chan].control, value);
         pCard->r->trigger[chan].control = value;
         return 1;

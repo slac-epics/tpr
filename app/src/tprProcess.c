@@ -14,9 +14,6 @@
 #include"timingFifoApi.h"
 #include"bsaCallbackApi.h"
 
-static timingPulseId    lastfid = 0;
-static epicsTimeStamp   lastTimeStamp;
-
 static BsaTimingCallback        gpBsaTimingCallback   = NULL;
 static void                    *gpBsaTimingUserPvt    = NULL;
 
@@ -36,6 +33,11 @@ static struct timeInfo {
     fifoInfo       message[MAX_TS_QUEUE];
 } ti[MAX_EVENT];
 
+#define MAX_ALLTS_QUEUE           2048
+#define MAX_ALLTS_QUEUE_MASK      2047
+static EventTimingData   allTimingInfo[MAX_ALLTS_QUEUE];
+static long long        allTimingInfoIdx = 0;
+
 struct dpvtStruct {
     tprCardStruct *pCard;
     int            card;
@@ -43,11 +45,10 @@ struct dpvtStruct {
     int            idx;
 };
 
-static struct BsaTimingPatternStruct pattern = {
+static struct BsaTimingData pattern = {
     0LL,
-    0LL, 0LL, 0LL, 0LL, 
-    0LL, 0LL,
-    {0, 0}
+    {0, 0},
+    0LL, 0LL, 0LL, 0LL, 0LL, 0LL, 0LL
 };
 
 static struct lookup {
@@ -141,7 +142,7 @@ static epicsStatus tprProceventRecord(eventRecord *pRec)
         return 1;
     }
     if (dpvt->idx == EVT) {
-		fifoInfo	*	pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
+        fifoInfo	*pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
         pRec->time.nsec = pFifoInfo->event.nanosecs;
     } else
@@ -157,7 +158,7 @@ static epicsStatus tprProcwaveformRecord(waveformRecord *pRec)
     if (evt < 0 || evt >= MAX_EVENT || !ti[evt].idx)
         return 1;
     if (dpvt->idx == MESSAGE) {
-        fifoInfo	*	pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
+        fifoInfo	*pFifoInfo = &ti[evt].message[(ti[evt].idx-1) & MAX_TS_QUEUE_MASK];
         memcpy(pRec->bptr, &pFifoInfo->event, sizeof(tprEvent));
         pRec->nord = sizeof(tprEvent) / sizeof(u32);
         pRec->time.secPastEpoch = pFifoInfo->event.seconds;
@@ -245,15 +246,26 @@ static dsetStruct devTprCeventRecord = {
 };
 epicsExportAddress (dset, devTprCeventRecord);
 
-int tprCurrentTimestamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
 {
-    epicsTime_ps->secPastEpoch = lastTimeStamp.secPastEpoch;
-    epicsTime_ps->nsec         = lastTimeStamp.nsec;
+    EventTimingData  *pInfo      = &allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK];
+    epicsTime_ps->secPastEpoch  = pInfo->fifo_time.secPastEpoch;
+    epicsTime_ps->nsec          = pInfo->fifo_time.nsec;
     return epicsTimeOK;
 }
 
-int tprGetEventTimestamp(epicsTimeStamp *epicsTime_ps, unsigned int eventCode)
+int timingGetCurTimeStamp(epicsTimeStamp  *pTimeStampDest)
 {
+    return tprCurrentTimeStamp(pTimeStampDest, 0);
+}
+
+/* timingGetEventTimeStamp() needed to support timingFifoApi */
+int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
+{
+    if (eventCode <= 0) {
+        tprCurrentTimeStamp( epicsTime_ps, eventCode );
+        return epicsTimeOK;
+    }
     if (eventCode >= MAX_EVENT || !ti[eventCode].pCard || !ti[eventCode].idx) {
         return epicsTimeERROR;
     } else {
@@ -271,19 +283,32 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
     }
     switch (message->tag & TAG_TYPE_MASK) {
     case TAG_EVENT: {
-        tprEvent *e = (tprEvent *)message;
-        if (e->pulseID > lastfid) {
-            lastfid = e->pulseID;
-            lastTimeStamp.secPastEpoch    = e->seconds;
-            lastTimeStamp.nsec        = e->nanosecs;
+        long long tsc = GetHiResTicks();
+        tprEvent *e = (tprEvent *)message; 
+        EventTimingData  *pInfo      = &allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK];
+        /* We'd like to check e->pulseID > lastfid, but this doesn't work for LCLS1! */
+        if (!allTimingInfoIdx || 
+            (e->seconds > pInfo->fifo_time.secPastEpoch ||
+             (e->seconds == pInfo->fifo_time.secPastEpoch &&
+              e->nanosecs > pInfo->fifo_time.nsec))) {
+            EventTimingData  *pTimingFifoInfo        = &allTimingInfo[allTimingInfoIdx&MAX_ALLTS_QUEUE_MASK];
+            pTimingFifoInfo->fifo_tsc               = tsc;
+            pTimingFifoInfo->fifo_fid               = e->pulseID;
+            pTimingFifoInfo->fifo_time.secPastEpoch = e->seconds;
+            pTimingFifoInfo->fifo_time.nsec         = e->nanosecs;
+            allTimingInfoIdx++;
         }
+        if (!pCard->client[chan].longoutRecord[0])
+            return;
+        /* Add timing info for this event to its fifo */
         int evt = pCard->client[chan].longoutRecord[0]->val;
         if (evt < 0 || evt >= MAX_EVENT)
             return;
         fifoInfo *pFifoInfo = &ti[evt].message[ti[evt].idx++ & MAX_TS_QUEUE_MASK];
-        pFifoInfo->fifo_tsc = GetHiResTicks();
+        pFifoInfo->fifo_tsc = tsc;
         memcpy(&pFifoInfo->event, e, sizeof(tprEvent));
         pCard->client[chan].mode = (message->tag & TAG_LCLS1) ? 0 : 1;
+        /* Generate the approprite ioscan for this channel */
         scanIoRequest(pCard->client[chan].ioscan);
         break;
     }
@@ -293,6 +318,7 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
             pattern.edefInitMask = bc->init;
             pattern.edefActiveMask = 0;
             pattern.edefAvgDoneMask = 0;
+            pattern.edefAllDoneMask = 0;
             pattern.edefUpdateMask = 0;
             pattern.edefMinorMask = ((pattern.edefMinorMask & ~bc->init) |
                                      (bc->init & bc->minor));
@@ -310,6 +336,7 @@ void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
             pattern.edefInitMask = 0;
             pattern.edefActiveMask = be->active;
             pattern.edefAvgDoneMask = be->avgdone;
+            /* pattern.edefAllDoneMask = ?? */
             pattern.edefUpdateMask = be->update;
             pattern.timeStamp.nsec = be->nanosecs;
             pattern.timeStamp.secPastEpoch = be->seconds;
@@ -381,7 +408,7 @@ int timingGetFifoInfo(
     unsigned int           eventCode,
     int                    incr,
     unsigned long long    *idx,
-    timingFifoInfo        *pFifoInfoDest)
+    EventTimingData        *pFifoInfoDest)
 {
     fifoInfo    *pFifoInfo;
     if (!pFifoInfoDest || !idx || eventCode >= MAX_EVENT)
@@ -400,10 +427,50 @@ int timingGetFifoInfo(
     return 0;
 }
 
-timingPulseId timingGetLastFiducial( )
+TimingPulseId timingGetLastFiducial()
 {
-    if (lastfid == 0x1ffff)
+    TimingPulseId pulseID = allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK].fifo_fid;
+    if (pulseID == 0x1ffff)
         return TIMING_PULSEID_INVALID;   /* Convert old LCLS1 invalid to new! */
     else
-        return lastfid;
+        return pulseID;
+}
+
+/* TODO: Add support for this timingFifoApi function */
+TimingPulseId timingGetFiducialForTimeStamp(epicsTimeStamp timeStamp)
+{
+    int i = (allTimingInfoIdx-1) & MAX_ALLTS_QUEUE_MASK;
+    int cnt;
+
+    /* Why 10?  Well, we need at least 1, and let's just be a bit conservative here. */
+    for (cnt = 0; cnt < MAX_ALLTS_QUEUE - 10; cnt++) {
+        /* Found a match! */
+        if (allTimingInfo[i].fifo_time.secPastEpoch == timeStamp.secPastEpoch &&
+            allTimingInfo[i].fifo_time.nsec == timeStamp.nsec)
+            return allTimingInfo[i].fifo_fid;
+        /* If we've gone back too far, there is no match! */
+        if (allTimingInfo[i].fifo_time.secPastEpoch > timeStamp.secPastEpoch ||
+            (allTimingInfo[i].fifo_time.secPastEpoch == timeStamp.secPastEpoch &&
+             allTimingInfo[i].fifo_time.nsec > timeStamp.nsec))
+            return TIMING_PULSEID_INVALID;
+        /* Go back one, rolling around if necessary. */
+        if (--i < 0)
+            i = MAX_ALLTS_QUEUE - 1;
+    }
+    return TIMING_PULSEID_INVALID;
+}
+
+void timingPrintNow(int e)
+{
+    EventTimingData  *pInfo      = &allTimingInfo[(allTimingInfoIdx-1)&MAX_ALLTS_QUEUE_MASK];
+    printf("0x%lx: %08x.%08x\n", pInfo->fifo_fid, pInfo->fifo_time.secPastEpoch, pInfo->fifo_time.nsec);
+    if (e >= 0) {
+        int i;
+        long long l = ti[e].idx;
+        printf("Event %d --> index %lld & MASK = %lld\n", e, l - 1, (l - 1) & MAX_TS_QUEUE_MASK);
+        for (i = 1; i <= 3; i++) {
+            fifoInfo    *p = &ti[e].message[(l - i) & MAX_TS_QUEUE_MASK];
+            printf("%8d: 0x%lx: %08x.%08x (%lld)\n", (int)((l - i) & MAX_TS_QUEUE_MASK), p->event.pulseID, p->event.seconds, p->event.nanosecs, p->fifo_tsc);
+        }
+    }
 }
