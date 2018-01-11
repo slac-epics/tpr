@@ -377,7 +377,7 @@ int RegisterBsaTimingCallback( BsaTimingCallback callback, void * pUserPvt )
 }
 
 /**
- * The timingGetFifoInfo() call allows a timingFifo client to access a
+ * The timingFifoRead() call allows a timingFifo client to access a
  * FIFO queue of the last MAX_TS_QUEUE eventCode arrival timestamps.
  * Each client has their own index position in the queue which can be controlled w/ the incr argument.
  * Clients should not write directly to the index value.
@@ -406,11 +406,11 @@ int RegisterBsaTimingCallback( BsaTimingCallback callback, void * pUserPvt )
  *     argument before reading the info from the FIFO
  *   - pFifoInfoDest ptr: epicsTimestamp, 64 bit fiducial, 64 bit tsc, and status
  */
-int timingGetFifoInfo(
+int timingFifoRead(
     unsigned int           eventCode,
     int                    incr,
-    unsigned long long    *idx,
-    EventTimingData        *pFifoInfoDest)
+    uint64_t              *idx,
+    EventTimingData       *pFifoInfoDest)
 {
     fifoInfo    *pFifoInfo;
     if (!pFifoInfoDest || !idx || eventCode >= MAX_EVENT)
