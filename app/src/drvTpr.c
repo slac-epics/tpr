@@ -18,7 +18,6 @@
 #include<dbAccess.h>           /* EPICS Database access definitions                              */
 #include<dbEvent.h>            /* EPICS Event monitoring routines and definitions                */
 #include<devLib.h>             /* EPICS Device hardware addressing support library               */
-#include<devSup.h>             /* EPICS Device support layer structures and symbols              */
 #include<drvSup.h>             /* EPICS Driver support layer structures and symbols              */
 #include<errlog.h>             /* EPICS Error logging support library                            */
 #include<recGbl.h>             /* EPICS Record Support global routine definitions                */
@@ -27,78 +26,12 @@
 #include<iocsh.h>
 #include<aSubRecord.h>
 #include"drvTpr.h"
+#include"tprdev.h"
 
 static tprCardStruct *tprCards[MAX_TPR] = { NULL };
 int tprDebug = 0;
 
 extern int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode);
-extern void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message);
-
-static int tprIrqHandlerThread(void *p)
-{
-    tprCardStruct *pCard = (tprCardStruct *)p;
-    tprQueues *q = pCard->q;
-    fd_set all;
-    int i, mfd = -1;
-    int64_t allrp[MOD_SHARED];
-    int64_t bsarp = 0;
-    int have_bsa = pCard->mmask & (1 << DEVNODE_MINOR_BSA);
-
-    FD_ZERO(&all);
-    for (i = 0; i < DEVNODE_MINOR_CONTROL; i++) {
-        if (pCard->mmask & (1 << i)) {
-            if (pCard->fd[i] > mfd)
-                mfd = pCard->fd[i];
-            FD_SET(pCard->fd[i], &all);
-            allrp[i] = q->allwp[i];
-        }
-    }
-    if (have_bsa) {
-        if (pCard->fd[DEVNODE_MINOR_BSA-1] > mfd)
-            mfd = pCard->fd[DEVNODE_MINOR_BSA-1];
-        FD_SET(pCard->fd[DEVNODE_MINOR_BSA-1], &all);
-        bsarp = q->bsawp;
-    }
-    mfd++;
-
-    while (1) {
-        int cnt, nb;
-        char buf[32];
-        fd_set rds = all;
-
-        cnt = select(mfd, &rds, NULL, NULL, NULL);
-        if (cnt < 0)
-            continue;  /* Assume we were just interrupted? */
-
-        if (have_bsa && FD_ISSET(pCard->fd[DEVNODE_MINOR_BSA-1], &rds)) {
-            nb = read(pCard->fd[DEVNODE_MINOR_BSA-1], buf, 32); /* Why 32? */
-            if (nb <= 0)
-                continue;   /* This can't be good... */
-
-            while(bsarp < q->bsawp) {
-                tprMessageProcess(pCard, DEVNODE_MINOR_BSA,
-                                  (tprHeader *)&q->bsaq[bsarp++ & (MAX_TPR_BSAQ-1)].word[0]);
-            }
-            cnt--;
-        }
-            
-        for (i = 0; cnt && i < DEVNODE_MINOR_CONTROL; i++) {
-            if (!FD_ISSET(pCard->fd[i], &rds))
-                continue;
-            nb = read(pCard->fd[i], buf, 32); /* Why 32? */
-            if (nb <= 0)
-                continue;   /* This can't be good... */
-
-            while(allrp[i] < q->allwp[i]) {
-                tprMessageProcess(pCard, i,
-                                  (tprHeader *)&q->allq[q->allrp[i].idx[allrp[i]++ & (MAX_TPR_ALLQ-1)]
-                                                        & (MAX_TPR_ALLQ-1)].word[0]);
-            }
-            cnt--;
-        }
-    }
-    return 0; /* Never get here anyway. */
-}
 
 tprCardStruct *tprGetCard(int card)
 {
@@ -107,11 +40,9 @@ tprCardStruct *tprGetCard(int card)
 
 static void TprConfigure(int card, int minor)
 {
-    char strDevice[20];
-    int fd, i, ret;
+    int i;
     tprCardStruct *pCard;
-    tprReg *r = NULL;
-    tprQueues *q = NULL;
+    void *devpvt;
     int isNew = 0;
 
     if (card < 0 || card >= MAX_TPR) {
@@ -123,38 +54,16 @@ static void TprConfigure(int card, int minor)
         errlogPrintf ("%s: Card %d, minor %d has already been configured\n", __func__, card, minor);
         return;
     }
-    if (minor == DEVNODE_MINOR_BSA)
-        ret = snprintf(strDevice, sizeof(strDevice), "%s%cBSA", DEVNODE_NAME_BASE, card + 'a');
-    else
-        ret = snprintf(strDevice, sizeof(strDevice), "%s%c%c", DEVNODE_NAME_BASE, card + 'a',
-                       (minor == DEVNODE_MINOR_CONTROL) ? 0 : ((minor <= 9) ? ('0' + minor)
-                                                                        : ('a' - 10 + minor)));
-    if (ret < 0) {
-        errlogPrintf("%s@%d(snprintf): %s.\n", __func__, __LINE__, strerror(-ret));
+    devpvt = tprOpen(card, minor); 
+    if (!devpvt)
         return;
-    }
-    fd = open(strDevice, O_RDWR);
-    if (fd < 0) {
-        errlogPrintf("%s@%d(open) Error: %s opening %s\n", __func__, __LINE__, strerror(errno), strDevice );
-        return;
-    }
-    if (minor == DEVNODE_MINOR_CONTROL)
-        r = (tprReg *) mmap(0, TPR_CONTROL_WINDOW, PROT_WRITE|PROT_READ, MAP_SHARED, fd, 0);
-    else if (pCard && pCard->q)
-        q = pCard->q;
-    else
-        q = (tprQueues *) mmap(0, TPR_QUEUE_WINDOW, PROT_READ, MAP_SHARED, fd, 0);
-    if (!r && !q) { // We had to set *one* of these!
-        close(fd);
-        return;
-    }
     if (!pCard) {
         isNew = 1;
         pCard = (struct tprCardStruct *)malloc(sizeof(struct tprCardStruct));
         if (pCard == NULL) {
             errlogPrintf("%s@%d(malloc): failed.\n", __func__, __LINE__);
             free(pCard);
-            close(fd);
+            tprClose(card, minor);
             return;
         }
         memset(pCard, 0, sizeof(struct tprCardStruct));
@@ -163,7 +72,7 @@ static void TprConfigure(int card, int minor)
         if (pCard->cardLock == 0) {
             errlogPrintf("%s@%d(epicsMutexCreate): failed.\n", __func__, __LINE__);
             free(pCard);
-            close(fd);
+            tprClose(card, minor);
             return;
         }
         pCard->mmask = 0;
@@ -172,18 +81,10 @@ static void TprConfigure(int card, int minor)
             scanIoInit(&pCard->config.lcls[0][i].ioscan);
             scanIoInit(&pCard->config.lcls[1][i].ioscan);
             scanIoInit(&pCard->client[i].ioscan);
-            pCard->fd[i] = -1;
         }
     }
     pCard->mmask |= 1 << minor;
-    if (minor == DEVNODE_MINOR_BSA)
-        pCard->fd[minor-1] = fd;
-    else
-        pCard->fd[minor] = fd;
-    if (r)
-        pCard->r = r;
-    if (q)
-        pCard->q = q;
+    pCard->devpvt = devpvt;
 
     if (isNew)
         tprCards[card] = pCard;
@@ -220,14 +121,9 @@ static int TprDrvInitialize(void)
         return 0;
     done = 1;
 
-    for (i = 0; i < MAX_TPR; i++) {
-        tprCardStruct *pCard = tprCards[i];
-        if (pCard && (pCard->mmask & ~(1 << DEVNODE_MINOR_CONTROL))) {
-            epicsThreadMustCreate("tprIrqHandler", epicsThreadPriorityHigh+9,
-                                  epicsThreadGetStackSize(epicsThreadStackMedium),
-                                  (EPICSTHREADFUNC)tprIrqHandlerThread, pCard);
-        }
-    }
+    for (i = 0; i < MAX_TPR; i++)
+        if (tprCards[i])
+            tprInitialize(tprCards[i]);
 
     if (generalTimeRegisterEventProvider("timingGetEventTimeStamp", 1000,
                                          (TIMEEVENTFUN)timingGetEventTimeStamp)) {
@@ -291,7 +187,7 @@ static const iocshFuncDef TprStartDef = {"TprStart", 1, TprStartArgs};
 static void TprStartCall(const iocshArgBuf *args)
 {
     tprCardStruct *pCard = tprGetCard(args[0].ival);
-    if (pCard->r)
+    if (tprMaster(pCard->devpvt))
         tprWrite(pCard, MODE, -1, tprGetConfig(pCard, -1, MODE));  // Set mode if master!
 }
 
@@ -323,9 +219,9 @@ long tprRateProc(struct aSubRecord *psub)
     tprCardStruct *pCard = *(tprCardStruct **)psub->valf;
 
     *(epicsInt32 *)psub->valb = *(epicsInt32 *)psub->vala;
-    *(epicsInt32 *)psub->vala = pCard->r->channel[chan].eventCount;
+    *(epicsInt32 *)psub->vala = tprRegRead(pCard->devpvt, TPR_CH_EVTCNT(chan));
     *(epicsInt32 *)psub->vald = *(epicsInt32 *)psub->valc;
-    *(epicsInt32 *)psub->valc = pCard->r->frameCount;
+    *(epicsInt32 *)psub->valc = tprRegRead(pCard->devpvt, TPR_FRAMECNT);
     if (*(epicsInt32 *)psub->valb == 0 || *(epicsInt32 *)psub->a - 1 != pCard->config.mode)
         *(double *)psub->vale = 0.0;
     else {

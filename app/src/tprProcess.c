@@ -3,7 +3,6 @@
 #include<stdlib.h>
 #include<string.h>
 #include<dbAccess.h>           /* EPICS Database access definitions                   */
-#include<devSup.h>             /* EPICS Device support layer structures and symbols   */
 #include<epicsExport.h>        /* EPICS Symbol exporting macro definitions            */
 #include<longoutRecord.h>
 #include<eventRecord.h>
@@ -14,6 +13,7 @@
 #include"drvTpr.h"
 #include"timingFifoApi.h"
 #include"bsaCallbackApi.h"
+#include"tprdev.h"
 
 static BsaTimingCallback        gpBsaTimingCallback   = NULL;
 static void                    *gpBsaTimingUserPvt    = NULL;
@@ -280,7 +280,7 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
 
 void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
 {
-    if (pCard->r && pCard->config.mode < 0) {
+    if (tprMaster(pCard->devpvt) && pCard->config.mode < 0) {
         return;
     }
     switch (message->tag & TAG_TYPE_MASK) {

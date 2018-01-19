@@ -163,11 +163,11 @@ int tprMaster(void *dev)
 void tprRegWrite(void *dev, int reg, uint32_t value)
 {
     struct tprPcie *devpvt = (struct tprPcie *)dev;
-    *(uint32_t *)(devpvt->r + reg) = value;
+    *(uint32_t *)(reg + (char *)devpvt->r) = value;
 }
 
 uint32_t tprRegRead(void *dev, int reg)
 {
     struct tprPcie *devpvt = (struct tprPcie *)dev;
-    return *(uint32_t *)(devpvt->r + reg);
+    return *(uint32_t *)(reg + (char *)devpvt->r);
 }

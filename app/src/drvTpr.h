@@ -1,11 +1,15 @@
+#ifndef __DRVTPR_H__
+#define __DRVTPR_H__
 #include<ellLib.h>             /* EPICS Linked list support library                              */
 #include<dbScan.h>             /* EPICS Database scan routines and definitions                   */
 #include<epicsMutex.h>         /* EPICS Mutex support library                                    */
 #include<epicsTime.h>          /* EPICS Time support library                                     */
+#include<devSup.h>             /* EPICS Device support layer structures and symbols              */
 #include"tpr.h"
 #include"timingFifoApi.h"
 
 #define MAX_TPR     2
+#define MAX_TPR_CHAN    12
 
 struct tprGlobalConfig {
     struct boRecord *boRecord[3];
@@ -66,7 +70,7 @@ typedef struct tprChannelState {
 
 typedef struct tprConfig {
     struct tprGlobalConfig  global;
-    struct tprChannelConfig lcls[2][MOD_SHARED];
+    struct tprChannelConfig lcls[2][MAX_TPR_CHAN];
     int                     mode;
 } tprConfig;
 
@@ -74,12 +78,10 @@ typedef struct tprCardStruct {
     ELLNODE          link;
     int              card;
     int              mmask;
+    void            *devpvt;
     epicsMutexId     cardLock;
-    int              fd[MOD_SHARED+1];
-    tprReg          *r;
-    tprQueues       *q;
     tprConfig        config;
-    tprChannelState  client[MOD_SHARED];
+    tprChannelState  client[MAX_TPR_CHAN];
 } tprCardStruct;
 
 extern tprCardStruct *tprGetCard(int card);
@@ -87,7 +89,7 @@ extern int tprWrite(tprCardStruct *pCard, int reg, int chan, int value);
 extern int tprGetConfig(tprCardStruct *pCard, int chan, int reg);
 extern int tprDebug;
 
-#define WDEBUG(lhs, rhs) if (tprDebug & TPR_DEBUG_WRITE) printf("WRITE %d (0x%x) --> "#lhs" (0x%x)\n", (rhs), (rhs), (u32)((char *)&(pCard->r->lhs) - (char *)pCard->r))
+#define WDEBUG(lhs, rhs) if (tprDebug & TPR_DEBUG_WRITE) printf("WRITE %d (0x%x) --> "#lhs" (0x%x)\n", (rhs), (rhs), (lhs))
 #define TPR_DEBUG_WRITE     1
 
 typedef struct dsetStruct {
@@ -98,3 +100,4 @@ typedef struct dsetStruct {
         DEVSUPFUN       get_ioint_info;
         DEVSUPFUN       proc;
 } dsetStruct;
+#endif /* __DRVTPR_H__ */

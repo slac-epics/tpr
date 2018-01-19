@@ -8,7 +8,7 @@ include $(TOP)/configure/CONFIG
 
 DBD += tpr.dbd
 LIBRARY_IOC = tpr
-tpr_SRCS += devTpr.c drvTpr.c tprProcess.c
+tpr_SRCS += devTpr.c drvTpr.c tprProcess.c tprPcie.c
 tpr_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #===========================
