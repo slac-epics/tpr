@@ -19,11 +19,13 @@ struct tprGlobalConfig {
     // These are not used, but defining them is simpler than fixing the code!
     struct mbboRecord *mbboRecord[1];
     struct mbboDirectRecord *mbboDirectRecord[1];
-    struct longoutRecord *longoutRecord[1];
+    struct longoutRecord *longoutRecord[2];
+#define MSGDLY1  ((6<<8)|0)
+#define MSGDLY2  ((6<<8)|1)
     struct longinRecord *longinRecord[1];
-#define FRAME   ((1<<8)|0)
+#define FRAME   ((7<<8)|0)
     struct biRecord *biRecord[1];
-#define RXLINK  ((2<<8)|0)
+#define RXLINK  ((8<<8)|0)
 };
 
 struct tprChannelConfig {
@@ -82,6 +84,7 @@ typedef struct tprCardStruct {
     epicsMutexId     cardLock;
     tprConfig        config;
     tprChannelState  client[MAX_TPR_CHAN];
+    int              lcls1_msgdly;
 } tprCardStruct;
 
 extern tprCardStruct *tprGetCard(int card);

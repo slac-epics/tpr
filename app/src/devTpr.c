@@ -43,6 +43,8 @@ static struct lookup {
     {"MODE",    MODE, 1},
     {"FRAME",   FRAME, 1},
     {"RXLINK",  RXLINK, 1},
+    {"MSGDLY1", MSGDLY1, 1},
+    {"MSGDLY2", MSGDLY2, 1},
     {"ENABLE",  ENABLE, 0},
     {"BSAEN",   BSAEN, 0},
     {"TRIGEN",  TRIGEN, 0},
@@ -286,6 +288,11 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         tprRegWrite(pCard->devpvt, TPR_CH_BSAWIDTH(chan), value);
         return 0;
     case TRGDEL:
+        if (pCard->config.mode == 0) {
+            value += pCard->lcls1_msgdly;
+            if (value < 0)
+                value = 0;
+        }
         WDEBUG(TPR_TR_DELAY(chan), value);
         tprRegWrite(pCard->devpvt, TPR_TR_DELAY(chan), value);
         return 1;
@@ -299,6 +306,15 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         WDEBUG(TPR_TR_FINEDEL(chan), value);
         tprRegWrite(pCard->devpvt, TPR_TR_FINEDEL(chan), value);
         return 1;
+    case MSGDLY1:
+        if (tprDebug & TPR_DEBUG_WRITE)
+            printf("WRITE %d (0x%x) --> MSGDLY1 (%p)\n", value, value, &pCard->lcls1_msgdly);
+        pCard->lcls1_msgdly = value;
+        return 0;
+    case MSGDLY2:
+        WDEBUG(TPR_MSGDLY, value);
+        tprRegWrite(pCard->devpvt, TPR_MSGDLY, value);
+        return 0;  /* MCB - Not really, but probably not worth the effort to make this work. */
     }
     return 0;
 }
@@ -324,6 +340,8 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
 
 /*
  * Logic here:
+ *    dpvt->idx == MSGDLY1|MSGDLY2     --> always write, as LCLS-I is actually software
+ *                                         and the HW is always LCLS-II.
  *    dpvt->lcls == -2                 --> always write!
  *    pCard->config.mode == -1         --> We aren't initialized, don't write 
  *                                         anything except the "always write" values.
@@ -336,7 +354,8 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;            \
         tprCardStruct *pCard = dpvt->pCard;                                   \
         int mode = pCard->config.mode;                                        \
-        if ((dpvt->lcls != -2) && (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode))) \
+        if (dpvt->lcls != -2 && dpvt->idx != MSGDLY1 && dpvt->idx != MSGDLY2 && \
+            (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode)))      \
             return 0;                                                         \
         if (tprWrite(pCard, dpvt->idx, dpvt->chan, pRec->FIELD))              \
             scanIoRequest(pCard->config.lcls[mode][dpvt->chan].ioscan);       \

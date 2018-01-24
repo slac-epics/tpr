@@ -67,3 +67,51 @@ record(mbbi, "$(BASE):STATUS")
   field(ONSV, "NO_ALARM")
   field(UNSV, "INVALID")
 }
+
+record(longout, "$(BASE):LCLS1:MSGDELAY")
+{
+  field(DESC,  "TPR LCLS1 Message Delay")
+  field(DTYP,  "TPR Master")
+  field(PINI,  "YES")
+  field(OUT,   "@$(CARD) 1 - MSGDLY1")
+  field(OMSL,  "supervisory")
+  field(FLNK,  "$(BASE):LCLS1:MDFANOUT")
+}
+
+record(fanout, "$(BASE):LCLS1:MDFANOUT")
+{
+  field(SELM, "All")
+  field(LNK1, "$(BASE):LCLS1:CH0:TRIG_DELAY_TICKS")
+  field(LNK2, "$(BASE):LCLS1:CH1:TRIG_DELAY_TICKS")
+  field(LNK3, "$(BASE):LCLS1:CH2:TRIG_DELAY_TICKS")
+  field(LNK4, "$(BASE):LCLS1:CH3:TRIG_DELAY_TICKS")
+  field(LNK5, "$(BASE):LCLS1:CH4:TRIG_DELAY_TICKS")
+  field(LNK6, "$(BASE):LCLS1:MDFANOUT2")
+}
+
+record(fanout, "$(BASE):LCLS1:MDFANOUT2")
+{
+  field(SELM, "All")
+  field(LNK1, "$(BASE):LCLS1:CH5:TRIG_DELAY_TICKS")
+  field(LNK2, "$(BASE):LCLS1:CH6:TRIG_DELAY_TICKS")
+  field(LNK3, "$(BASE):LCLS1:CH7:TRIG_DELAY_TICKS")
+  field(LNK4, "$(BASE):LCLS1:CH8:TRIG_DELAY_TICKS")
+  field(LNK5, "$(BASE):LCLS1:CH9:TRIG_DELAY_TICKS")
+  field(LNK6, "$(BASE):LCLS1:MDFANOUT3")
+}
+
+record(fanout, "$(BASE):LCLS1:MDFANOUT3")
+{
+  field(SELM, "All")
+  field(LNK1, "$(BASE):LCLS1:CHA:TRIG_DELAY_TICKS")
+  field(LNK2, "$(BASE):LCLS1:CHB:TRIG_DELAY_TICKS")
+}
+
+record(longout, "$(BASE):LCLS2:MSGDELAY")
+{
+  field(DESC,  "TPR LCLS2 Message Delay")
+  field(DTYP,  "TPR Master")
+  field(PINI,  "YES")
+  field(OUT,   "@$(CARD) 2 - MSGDLY2")
+  field(OMSL,  "supervisory")
+}
