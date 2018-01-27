@@ -20,8 +20,7 @@ struct tprGlobalConfig {
     struct mbboRecord *mbboRecord[1];
     struct mbboDirectRecord *mbboDirectRecord[1];
     struct longoutRecord *longoutRecord[2];
-#define MSGDLY1  ((6<<8)|0)
-#define MSGDLY2  ((6<<8)|1)
+#define MSGDLY  ((6<<8)|0)
     struct longinRecord *longinRecord[1];
 #define FRAME   ((7<<8)|0)
     struct biRecord *biRecord[1];
@@ -34,9 +33,11 @@ struct tprChannelConfig {
 #define BSAEN   ((1<<8)|1)
 #define TRIGEN  ((1<<8)|2)
 #define POL     ((1<<8)|3)
-    struct mbboRecord *mbboRecord[2];
-#define EVENT   ((2<<8)|0)
-#define DMODE   ((2<<8)|1)
+    struct mbboRecord *mbboRecord[4];
+#define RMODE   ((2<<8)|0)
+#define FRATE   ((2<<8)|1)
+#define ACRATE  ((2<<8)|2)
+#define DMODE   ((2<<8)|3)
     struct mbboDirectRecord *mbboDirectRecord[2];
 #define TSMASK  ((3<<8)|0)
 #define DMASK   ((3<<8)|1)
@@ -84,7 +85,6 @@ typedef struct tprCardStruct {
     epicsMutexId     cardLock;
     tprConfig        config;
     tprChannelState  client[MAX_TPR_CHAN];
-    int              lcls1_msgdly;
 } tprCardStruct;
 
 extern tprCardStruct *tprGetCard(int card);

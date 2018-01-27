@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 630
-y 250
+x 587
+y 688
 w 926
 h 200
 font "helvetica-medium-r-18.0"
@@ -31,7 +31,7 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 344
+x 364
 y 8
 w 56
 h 24
@@ -42,8 +42,8 @@ offColor index 3
 inconsistentColor index 40
 topShadowColor index 1
 botShadowColor index 11
-controlPv "$(TPR):LCLS$(L):CH$(CH):ENABLE_BSA"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):ENABLE_BSA"
+controlPv "$(TPR):LCLS1:CH$(CH):ENABLE_BSA"
+indicatorPv "$(TPR):LCLS1:CH$(CH):ENABLE_BSA"
 onLabel "Enabled"
 offLabel "Disabled"
 3d
@@ -57,7 +57,7 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 408
+x 428
 y 8
 w 56
 h 24
@@ -68,8 +68,8 @@ offColor index 3
 inconsistentColor index 40
 topShadowColor index 1
 botShadowColor index 11
-controlPv "$(TPR):LCLS$(L):CH$(CH):ENABLE_TRIG"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):ENABLE_TRIG"
+controlPv "$(TPR):LCLS1:CH$(CH):ENABLE_TRIG"
+indicatorPv "$(TPR):LCLS1:CH$(CH):ENABLE_TRIG"
 onLabel "Enabled"
 offLabel "Disabled"
 3d
@@ -83,7 +83,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 408
+x 428
 y 8
 w 56
 h 24
@@ -91,7 +91,7 @@ font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 35
 bgColor index 6
-visPv "$(TPR):LCLS$(L):CH$(CH):ENABLE_TRIG"
+visPv "$(TPR):LCLS1:CH$(CH):ENABLE_TRIG"
 visMin "0"
 visMax "1"
 value {
@@ -116,8 +116,8 @@ offColor index 3
 inconsistentColor index 40
 topShadowColor index 1
 botShadowColor index 11
-controlPv "$(TPR):LCLS$(L):CH$(CH):ENABLE"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):ENABLE"
+controlPv "$(TPR):LCLS1:CH$(CH):ENABLE"
+indicatorPv "$(TPR):LCLS1:CH$(CH):ENABLE"
 onLabel "Enabled"
 offLabel "Disabled"
 3d
@@ -150,11 +150,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 476
+x 496
 y 8
 w 84
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_WIDTH"
+controlPv "$(TPR):LCLS1:CH$(CH):TRIG_WIDTH"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 25
@@ -175,7 +175,7 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 408
+x 428
 y 36
 w 56
 h 24
@@ -186,8 +186,8 @@ offColor index 3
 inconsistentColor index 40
 topShadowColor index 1
 botShadowColor index 11
-controlPv "$(TPR):LCLS$(L):CH$(CH):POLARITY"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):POLARITY"
+controlPv "$(TPR):LCLS1:CH$(CH):POLARITY"
+indicatorPv "$(TPR):LCLS1:CH$(CH):POLARITY"
 onLabel "Invert"
 offLabel "Normal"
 3d
@@ -203,9 +203,9 @@ minor 7
 release 0
 x 72
 y 8
-w 152
+w 172
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):ENABLE.DESC"
+controlPv "$(TPR):LCLS1:CH$(CH):ENABLE.DESC"
 format "string"
 font "courier-bold-r-12.0"
 fontAlign "center"
@@ -227,11 +227,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 568
+x 588
 y 36
 w 92
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_DELAY_ACTUAL"
+controlPv "$(TPR):LCLS1:CH$(CH):TRIG_DELAY_ACTUAL"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 16
@@ -252,11 +252,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 476
+x 496
 y 36
 w 84
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_WIDTH_ACTUAL"
+controlPv "$(TPR):LCLS1:CH$(CH):TRIG_WIDTH_ACTUAL"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 16
@@ -277,11 +277,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 740
+x 760
 y 8
-w 56
+w 72
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):COUNT"
+controlPv "$(TPR):LCLS1:CH$(CH):COUNT"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 16
@@ -302,11 +302,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 800
+x 836
 y 8
 w 56
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):RATE"
+controlPv "$(TPR):LCLS1:CH$(CH):RATE"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 16
@@ -327,9 +327,9 @@ beginObjectProperties
 major 4
 minor 0
 release 1
-x 0
+x 4
 y 64
-w 864
+w 890
 h 4
 lineColor index 14
 fill
@@ -337,8 +337,8 @@ fillColor index 14
 lineWidth 2
 numPoints 2
 xPoints {
-  0 0
-  1 864
+  0 4
+  1 894
 }
 yPoints {
   0 64
@@ -352,11 +352,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 568
+x 588
 y 8
 w 92
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_DELAY"
+controlPv "$(TPR):LCLS1:CH$(CH):TRIG_DELAY"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 25
@@ -369,27 +369,6 @@ nullColor index 18
 nullCondition "disabled"
 newPos
 objType "controls"
-endObjectProperties
-
-# (Menu Button)
-object activeMenuButtonClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 72
-y 36
-w 152
-h 24
-fgColor index 14
-fgAlarm
-bgColor index 4
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):EVENT_SELECT"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):EVENT_SELECT"
-font "helvetica-bold-r-14.0"
 endObjectProperties
 
 # (Static Text)
@@ -406,104 +385,11 @@ font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 35
 bgColor index 6
-visPv "$(TPR):LCLS$(L):CH$(CH):ENABLE"
+visPv "$(TPR):LCLS1:CH$(CH):ENABLE"
 visMin "0"
 visMax "1"
 value {
   "Disabled"
-}
-endObjectProperties
-
-# (Group)
-object activeGroupClass
-beginObjectProperties
-major 4
-minor 0
-release 0
-x 228
-y 8
-w 40
-h 52
-
-beginGroup
-
-# (Text Control)
-object activeXTextDspClass
-beginObjectProperties
-major 4
-minor 7
-release 0
-x 228
-y 8
-w 40
-h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):SEQ"
-font "helvetica-medium-r-12.0"
-fontAlign "center"
-fgColor index 25
-fgAlarm
-bgColor index 5
-editable
-motifWidget
-limitsFromDb
-nullColor index 18
-nullCondition "disabled"
-newPos
-objType "controls"
-endObjectProperties
-
-# (Text Monitor)
-object activeXTextDspClass:noedit
-beginObjectProperties
-major 4
-minor 7
-release 0
-x 228
-y 36
-w 40
-h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):SEQ"
-font "helvetica-medium-r-12.0"
-fontAlign "center"
-fgColor index 16
-fgAlarm
-bgColor index 12
-limitsFromDb
-nullColor index 40
-smartRefresh
-useHexPrefix
-showUnits
-newPos
-objType "monitors"
-endObjectProperties
-
-endGroup
-
-visPv "$(TPR):LCLS$(L):CH$(CH):EVENT_SELECT.RVAL"
-visMin "13"
-visMax "14"
-endObjectProperties
-
-# (Related Display)
-object relatedDisplayClass
-beginObjectProperties
-major 4
-minor 4
-release 0
-x 276
-y 36
-w 60
-h 24
-fgColor index 14
-bgColor index 4
-topShadowColor index 1
-botShadowColor index 14
-font "helvetica-bold-r-8.0"
-buttonLabel "Dest Ctrl"
-numPvs 4
-numDsps 1
-displayFileName {
-  0 "tprScreens/tpr-dest$(L).edl"
 }
 endObjectProperties
 
@@ -513,7 +399,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 344
+x 364
 y 8
 w 56
 h 24
@@ -521,7 +407,7 @@ font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 35
 bgColor index 6
-visPv "$(TPR):LCLS$(L):CH$(CH):ENABLE_BSA"
+visPv "$(TPR):LCLS1:CH$(CH):ENABLE_BSA"
 visMin "0"
 visMax "1"
 value {
@@ -535,11 +421,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 664
+x 684
 y 8
 w 72
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_DELAY_TICKS"
+controlPv "$(TPR):LCLS1:CH$(CH):TRIG_DELAY_TICKS"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 16
@@ -560,11 +446,11 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 664
+x 684
 y 36
 w 72
 h 24
-controlPv "$(TPR):LCLS$(L):CH$(CH):TRIG_FINE_DELAY"
+controlPv "$(TPR):LCLS1:CH$(CH):TRIG_FINE_DELAY"
 font "helvetica-medium-r-12.0"
 fontAlign "center"
 fgColor index 16
@@ -585,14 +471,14 @@ beginObjectProperties
 major 4
 minor 0
 release 0
-x 660
+x 680
 y 32
 w 76
 h 28
 lineColor index 7
 fill
 fillColor index 7
-visPv "$(TPR):LCLS$(L):CH$(CH):TRIG_FINE_DELAY.DISA"
+visPv "$(TPR):LCLS1:CH$(CH):TRIG_FINE_DELAY.DISA"
 visMin "1"
 visMax "2"
 endObjectProperties
@@ -603,198 +489,66 @@ beginObjectProperties
 major 4
 minor 0
 release 0
-x 228
+x 248
 y 8
-w 44
-h 48
+w 40
+h 52
 
 beginGroup
 
-# (Button)
-object activeButtonClass
+# (Text Control)
+object activeXTextDspClass
 beginObjectProperties
 major 4
-minor 1
+minor 7
 release 0
-x 228
+x 248
 y 8
-w 20
-h 16
-fgColor index 14
-onColor index 15
-offColor index 20
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):PHASE1"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):PHASE1"
-onLabel "1"
-offLabel "1"
-labelType "literal"
-3d
-font "helvetica-bold-r-12.0"
+w 40
+h 24
+controlPv "$(TPR):LCLS1:CH$(CH):SEQ"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 25
+fgAlarm
+bgColor index 5
+editable
+motifWidget
+limitsFromDb
+nullColor index 18
+nullCondition "disabled"
+newPos
 objType "controls"
 endObjectProperties
 
-# (Button)
-object activeButtonClass
+# (Text Monitor)
+object activeXTextDspClass:noedit
 beginObjectProperties
 major 4
-minor 1
+minor 7
 release 0
-x 228
-y 24
-w 20
-h 16
-fgColor index 14
-onColor index 15
-offColor index 20
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):PHASE2"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):PHASE2"
-onLabel "2"
-offLabel "2"
-labelType "literal"
-3d
-font "helvetica-bold-r-12.0"
-objType "controls"
-endObjectProperties
-
-# (Button)
-object activeButtonClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 228
-y 40
-w 20
-h 16
-fgColor index 14
-onColor index 15
-offColor index 20
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):PHASE3"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):PHASE3"
-onLabel "3"
-offLabel "3"
-labelType "literal"
-3d
-font "helvetica-bold-r-12.0"
-objType "controls"
-endObjectProperties
-
-# (Button)
-object activeButtonClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 252
-y 8
-w 20
-h 16
-fgColor index 14
-onColor index 15
-offColor index 20
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):PHASE4"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):PHASE4"
-onLabel "4"
-offLabel "4"
-labelType "literal"
-3d
-font "helvetica-bold-r-12.0"
-objType "controls"
-endObjectProperties
-
-# (Button)
-object activeButtonClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 252
-y 24
-w 20
-h 16
-fgColor index 14
-onColor index 15
-offColor index 20
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):PHASE5"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):PHASE5"
-onLabel "5"
-offLabel "5"
-labelType "literal"
-3d
-font "helvetica-bold-r-12.0"
-objType "controls"
-endObjectProperties
-
-# (Button)
-object activeButtonClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 252
-y 40
-w 20
-h 16
-fgColor index 14
-onColor index 15
-offColor index 20
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):PHASE6"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):PHASE6"
-onLabel "6"
-offLabel "6"
-labelType "literal"
-3d
-font "helvetica-bold-r-12.0"
-objType "controls"
+x 248
+y 36
+w 40
+h 24
+controlPv "$(TPR):LCLS1:CH$(CH):SEQ"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 16
+fgAlarm
+bgColor index 12
+limitsFromDb
+nullColor index 40
+smartRefresh
+useHexPrefix
+showUnits
+newPos
+objType "monitors"
 endObjectProperties
 
 endGroup
 
-visPv "$(TPR):LCLS$(L):CH$(CH):EVENT_SELECT.RVAL"
-visMin "7"
-visMax "13"
-endObjectProperties
-
-# (Button)
-object activeButtonClass
-beginObjectProperties
-major 4
-minor 1
-release 0
-x 276
-y 8
-w 60
-h 24
-fgColor index 14
-onColor index 4
-offColor index 4
-inconsistentColor index 7
-topShadowColor index 1
-botShadowColor index 14
-controlPv "$(TPR):LCLS$(L):CH$(CH):BEAM"
-indicatorPv "$(TPR):LCLS$(L):CH$(CH):BEAM"
-onLabel "Beam"
-offLabel "Other Dest"
-3d
-font "helvetica-bold-r-10.0"
-objType "controls"
+visMin "1"
+visMax "2"
 endObjectProperties
 

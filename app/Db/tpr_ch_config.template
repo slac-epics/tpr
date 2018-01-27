@@ -40,253 +40,19 @@ record(bo, "$(BASE):LCLS$(L):CH$(N):ENABLE_TRIG")
   field(ONAM, "On")
 }
 
-record(bo, "$(BASE):LCLS$(L):CH$(N):BEAM")
-{
-  field(VAL,  "0")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "Other Dest")
-  field(ONAM, "Beam")
-  field(FLNK, "$(BASE):LCLS$(L):CH$(N):DO_SET_BEAM.PROC")
-}
-
-record(calcout, "$(BASE):LCLS$(L):CH$(N):DO_SET_BEAM")
-{
-  field(INPA, "$(BASE):LCLS$(L):CH$(N):BEAM")
-  field(INPB, "$(BASE):LCLS$(L):CH$(N):ISBEAM")
-  field(CALC, "A!=B")
-  field(OOPT, "When Non-zero")
-  field(DOPT, "Use OCAL")
-  field(OCAL, "1")
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):SET_BEAM.PROC")
-}
-
-record(seq,  "$(BASE):LCLS$(L):CH$(N):SET_BEAM")
-{
-  field(SELM, "All")
-  field(DOL1, "1")
-  field(LNK1, "$(BASE):LCLS$(L):CH$(N):SET_BEAM_INPROGRESS PP")
-  field(DOL2, "0")
-  field(LNK2, "$(BASE):LCLS$(L):CH$(N):DEST_MODE PP")  # Inclusive
-  field(DOL3, "$(BASE):LCLS$(L):CH$(N):BEAMDEST.B0")
-  field(LNK3, "$(BASE):LCLS$(L):CH$(N):DEST0 PP")
-  field(DOL4, "$(BASE):LCLS$(L):CH$(N):BEAMDEST.B1")
-  field(LNK4, "$(BASE):LCLS$(L):CH$(N):DEST1 PP")
-  field(DOL5, "$(BASE):LCLS$(L):CH$(N):BEAMDEST.B2")
-  field(LNK5, "$(BASE):LCLS$(L):CH$(N):DEST2 PP")
-  field(DOL6, "$(BASE):LCLS$(L):CH$(N):BEAMDEST.B3")
-  field(LNK6, "$(BASE):LCLS$(L):CH$(N):DEST3 PP")
-  field(DOL7, "0")
-  field(LNK7, "$(BASE):LCLS$(L):CH$(N):SET_BEAM_INPROGRESS PP")
-}
-
-record(longout, "$(BASE):LCLS$(L):CH$(N):SET_BEAM_INPROGRESS")
-{
-  field(VAL,  "0")
-  field(PINI, "YES")
-}
-
-record(calc, "$(BASE):LCLS$(L):CH$(N):RAWBEAMDEST")
-{
-  field(INPA, "$(L)")
-  field(PINI, "YES")
-  field(CALC, "(A==1)?7:15")   # Note: not clear what the value should be for LCLS2!
-  field(FLNK, "$(BASE):LCLS$(L):CH$(N):BEAMDEST")
-}
-
-record(mbbiDirect, "$(BASE):LCLS$(L):CH$(N):BEAMDEST")
-{
-  field(DTYP, "Soft Channel")
-  field(INP, "$(BASE):LCLS$(L):CH$(N):RAWBEAMDEST")
-}
-
-record(calc, "$(BASE):LCLS$(L):CH$(N):ISBEAM")
-{
-  field(INPA, "$(BASE):LCLS$(L):CH$(N):BEAMDEST NPP")
-  field(INPB, "$(BASE):LCLS$(L):CH$(N):DEST NPP")
-  field(INPC, "$(BASE):LCLS$(L):CH$(N):DEST_MODE NPP")
-  field(CALC, "(C==0)&&(A==B)")
-  field(FLNK, "$(BASE):LCLS$(L):CH$(N):RESET_BEAM.PROC")
-}
-
-record(calcout, "$(BASE):LCLS$(L):CH$(N):RESET_BEAM")
-{
-  field(INPA, "$(BASE):LCLS$(L):CH$(N):BEAM NPP")
-  field(INPB, "$(BASE):LCLS$(L):CH$(N):ISBEAM NPP")
-  field(INPC, "$(BASE):LCLS$(L):CH$(N):SET_BEAM_INPROGRESS NPP")
-  field(CALC, "(A!=B)&&(C==0)")
-  field(OOPT, "When Non-zero")
-  field(DOPT, "Use OCAL")
-  field(OCAL, "B")
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):BEAM PP")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):DEST0")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):DEST.B0 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "Off")
-  field(ONAM, "On")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):DEST1")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):DEST.B1 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "Off")
-  field(ONAM, "On")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):DEST2")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):DEST.B2 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "Off")
-  field(ONAM, "On")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):DEST3")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):DEST.B3 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "Off")
-  field(ONAM, "On")
-}
-
-record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):DEST")
-{
-  field(DESC, "TPR Channel $(N) Dest Mask")
-  field(DTYP, "TPR Master")
-  field(OUT,  "@$(CARD) $(L) $(N) DMASK")
-  field(OMSL, "supervisory")
-  field(FLNK, "$(BASE):LCLS$(L):CH$(N):ISBEAM")
-}
-
-record(mbbo, "$(BASE):LCLS$(L):CH$(N):DEST_MODE")
-{
-  field(DESC, "TPR Channel $(N) Dest Mode")
-  field(DTYP, "TPR Master")
-  field(OUT,  "@$(CARD) $(L) $(N) DMODE")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZRST, "Inclusive")
-  field(ZRVL, "0")
-  field(ONST, "Exclusive")
-  field(ONVL, "1")
-  field(TWST, "Do Not Care")
-  field(TWVL, "2")
-  field(THST, "")
-  field(THSV, "INVALID")
-  field(FRST, "")
-  field(FRSV, "INVALID")
-  field(FVST, "")
-  field(FVSV, "INVALID")
-  field(SXST, "")
-  field(SXSV, "INVALID")
-  field(SVST, "")
-  field(SVSV, "INVALID")
-  field(EIST, "")
-  field(EISV, "INVALID")
-  field(NIST, "")
-  field(NISV, "INVALID")
-  field(TEST, "")
-  field(TESV, "INVALID")
-  field(ELST, "")
-  field(ELSV, "INVALID")
-  field(TVST, "")
-  field(TVSV, "INVALID")
-  field(TTST, "")
-  field(TTSV, "INVALID")
-  field(FTST, "")
-  field(FTSV, "INVALID")
-  field(FFST, "")
-  field(FFSV, "INVALID")
-  field(FFST, "")
-  field(UNSV, "INVALID")
-  field(VAL,  "2")
-  field(FLNK, "$(BASE):LCLS$(L):CH$(N):ISBEAM")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):PHASE1")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TSMASK.B0 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "0")
-  field(ONAM, "1")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):PHASE2")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TSMASK.B1 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "0")
-  field(ONAM, "1")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):PHASE3")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TSMASK.B2 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "0")
-  field(ONAM, "1")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):PHASE4")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TSMASK.B3 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "0")
-  field(ONAM, "1")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):PHASE5")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TSMASK.B4 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "0")
-  field(ONAM, "1")
-}
-
-record(bo, "$(BASE):LCLS$(L):CH$(N):PHASE6")
-{
-  field(OUT,  "$(BASE):LCLS$(L):CH$(N):TSMASK.B5 PP")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(ZNAM, "0")
-  field(ONAM, "1")
-}
-
-record(mbboDirect, "$(BASE):LCLS$(L):CH$(N):TSMASK")
-{
-  field(DESC, "TPR Channel $(N) TS MASK")
-  field(DTYP, "TPR Master")
-  field(OUT,  "@$(CARD) $(L) $(N) TSMASK")
-  field(PINI, "YES")
-  field(OMSL, "supervisory")
-  field(VAL,  "16")
-}
-
 record(longout, "$(BASE):LCLS$(L):CH$(N):SEQ")
 {
   field(DESC,  "TPR Channel $(N) seq bit")
   field(DTYP,  "TPR Master")
   field(OUT,   "@$(CARD) $(L) $(N) SEQ")
+  field(PINI,  "YES")
   field(OMSL,  "supervisory")
 }
 
 record(ao, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY")
 {
   field(DESC,  "TPR Channel $(N) BSA Delay")
-  field(EGU,   "us")
+  field(EGU,   "ns")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT.PROC")
 }
 
@@ -294,7 +60,7 @@ record(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY")
   field(INPB, "$(RATE)")
-  field(CALC, "FLOOR(1000 * A / B + 0.5)")
+  field(CALC, "FLOOR(A / B + 0.5)")
   field(OUT,  "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_TICKS PP")
 }
 
@@ -309,8 +75,7 @@ record(longout, "$(BASE):LCLS$(L):CH$(N):BSA_DELAY_TICKS")
 record(ao, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH")
 {
   field(DESC,  "TPR Channel $(N) BSA Width")
-  field(EGU,   "us")
-  field(PREC,  "3")
+  field(EGU,   "ns")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT.PROC")
 }
 
@@ -318,8 +83,7 @@ record(calcout, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH")
   field(INPB, "$(RATE)")
-  field(CALC, "FLOOR(1000 * A / B + 0.5)")
-  field(PREC,  "3")
+  field(CALC, "FLOOR(A / B + 0.5)")
   field(OUT,  "$(BASE):LCLS$(L):CH$(N):BSA_WIDTH_TICKS PP")
 }
 
@@ -345,9 +109,8 @@ record(bo, "$(BASE):LCLS$(L):CH$(N):POLARITY")
 record(ao, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH")
 {
   field(DESC,  "TPR Channel $(N) Trigger Width")
-  field(EGU,   "us")
+  field(EGU,   "ns")
   field(PINI,  "YES")
-  field(PREC,  "3")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT.PROC")
 }
 
@@ -355,8 +118,7 @@ record(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH")
   field(INPB, "$(RATE)")
-  field(CALC, "FLOOR(1000 * A / B + 0.5)")
-  field(PREC,  "3")
+  field(CALC, "FLOOR(A / B + 0.5)")
   field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_TICKS PP")
 }
 
@@ -372,16 +134,15 @@ record(calc, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_ACTUAL")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_WIDTH_TICKS CPP")
   field(INPB, "$(RATE)")
-  field(PREC,  "3")
-  field(CALC, "A * B / 1000")
+  field(CALC, "A * B")
+  field(EGU,   "ns")
 }
 
 record(ao, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
 {
   field(DESC,  "TPR Channel $(N) Trigger Delay")
-  field(EGU,   "us")
+  field(EGU,   "ns")
   field(PINI,  "YES")
-  field(PREC,  "3")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT.PROC")
 }
 
@@ -389,7 +150,9 @@ record(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_CVT")
 {
   field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY")
   field(INPB, "$(RATE)")
-  field(CALC, "FLOOR(1000 * A / B + 0.5)")
+  field(INPC, "$(L)")
+  field(INPD, "$(BASE):LCLS$(L):MSGDELAY")
+  field(CALC, "FLOOR((C==1)?((A+D>0)?((A+D)/B+0.5):0):(A/B))")
   field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS PP")
   field(FLNK, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT.PROC")
 }
@@ -400,7 +163,7 @@ record(calcout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_FINE_CVT")
   field(INPB, "$(RATE)")
   field(INPC, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS")
   field(INPD, "$(L)")
-  field(CALC, "(D==2)?((1000 * A - C * B) * 12.16):0")       # 12.16 = 1000ps/ns / 82.24ps step.
+  field(CALC, "(D==1)?0:FLOOR((A-B*C)*12.16+0.5)")           # 12.16 = 1000ps/ns / 82.24ps/step.
   field(OUT,  "$(BASE):LCLS$(L):CH$(N):TRIG_FINE_DELAY PP")  # The write will handle the 31,32 weirdness.
 }
 
@@ -414,28 +177,31 @@ record(longout, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS")
 
 record(calc, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_ACTUAL")
 {
-  field(INPA, "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS CPP")
-  field(INPB, "$(RATE)")
-  field(PREC,  "3")
-  field(CALC, "A * B / 1000")
+  field(INPA,  "$(BASE):LCLS$(L):CH$(N):TRIG_DELAY_TICKS CPP")
+  field(INPB,  "$(RATE)")
+  field(INPC,  "$(BASE):LCLS$(L):CH$(N):TRIG_FINE_DELAY CPP")
+  field(INPD,  "$(L)")
+  field(INPE,  "$(BASE):LCLS$(L):MSGDELAY CPP")
+  field(CALC,  "(A*B)+((D==1)?(-E):(C*1000/12160))")
+  field(EGU,   "ns")
 }
 
 record(longout, "$(BASE):LCLS$(L):CH$(N):TRIG_FINE_DELAY")
 {
   field(DESC,  "TPR Channel $(N) Trigger Fine Delay")
-  field(DTYP, "TPR Master")
-  field(OUT,  "@$(CARD) $(L) $(N) TRGFDEL")
+  field(DTYP,  "TPR Master")
+  field(OUT,   "@$(CARD) $(L) $(N) TRGFDEL")
   field(OMSL,  "supervisory")
-  field(DISA, "$(L)")   # Disable this for LCLS-I!
-  field(DISV, "1")
+  field(DISA,  "$(L)")   # Disable this for LCLS-I!
+  field(DISV,  "1")
 }
 
 record(longin, "$(BASE):LCLS$(L):CH$(N):CHANGE")
 {
   field(DESC,  "TPR Channel $(N) Parameter Change")
-  field(DTYP, "TPR Master")
-  field(INP,  "@$(CARD) $(L) $(N) CHANGE")
-  field(SCAN, "I/O Intr")
+  field(DTYP,  "TPR Master")
+  field(INP,   "@$(CARD) $(L) $(N) CHANGE")
+  field(SCAN,  "I/O Intr")
 }
 
 record(calcout, "$(BASE):LCLS$(L):CH$(N):HALFHZ")
@@ -446,14 +212,14 @@ record(calcout, "$(BASE):LCLS$(L):CH$(N):HALFHZ")
   field(DOPT, "Use OCAL")
   field(OCAL, "1")
   field(SCAN, "1 second")
-  field(OUT, "$(BASE):LCLS$(L):CH$(N):COUNT.PROC")
+  field(OUT,  "$(BASE):LCLS$(L):CH$(N):COUNT.PROC")
 }
 
 record(longin, "$(BASE):LCLS$(L):CH$(N):COUNT")
 {
   field(DESC,  "TPR Channel $(N) Frame Count")
-  field(DTYP, "TPR Master")
-  field(INP,  "@$(CARD) $(L) $(N) COUNT")
+  field(DTYP,  "TPR Master")
+  field(INP,   "@$(CARD) $(L) $(N) COUNT")
   field(FLNK,  "$(BASE):LCLS$(L):CH$(N):RATECALC.PROC")
 }
 

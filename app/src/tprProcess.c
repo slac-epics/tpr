@@ -278,8 +278,9 @@ int timingGetEventTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode)
 }
 
 
-void tprMessageProcess(tprCardStruct *pCard, int chan, tprHeader *message)
+void tprMessageProcess(void *token, int chan, tprHeader *message)
 {
+    tprCardStruct *pCard = (tprCardStruct *)token;
     if (tprMaster(pCard->devpvt) && pCard->config.mode < 0) {
         return;
     }

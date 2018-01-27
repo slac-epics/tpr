@@ -32,6 +32,7 @@ static tprCardStruct *tprCards[MAX_TPR] = { NULL };
 int tprDebug = 0;
 
 extern int tprCurrentTimeStamp(epicsTimeStamp *epicsTime_ps, int eventCode);
+extern void tprMessageProcess(void *token, int chan, tprHeader *message);
 
 tprCardStruct *tprGetCard(int card)
 {
@@ -122,8 +123,8 @@ static int TprDrvInitialize(void)
     done = 1;
 
     for (i = 0; i < MAX_TPR; i++)
-        if (tprCards[i])
-            tprInitialize(tprCards[i]);
+        if (tprCards[i] && (tprCards[i]->mmask & ~(1 <<DEVNODE_MINOR_CONTROL)))
+            tprRegister(tprCards[i]->devpvt, tprMessageProcess, tprCards[i]);
 
     if (generalTimeRegisterEventProvider("timingGetEventTimeStamp", 1000,
                                          (TIMEEVENTFUN)timingGetEventTimeStamp)) {

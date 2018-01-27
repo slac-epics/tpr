@@ -41,24 +41,30 @@ static struct lookup {
     {"CRESET",  CRESET, 1},
     {"XBAR",    XBAR, 1},
     {"MODE",    MODE, 1},
+    {"MSGDLY",  MSGDLY, 1},
     {"FRAME",   FRAME, 1},
     {"RXLINK",  RXLINK, 1},
-    {"MSGDLY1", MSGDLY1, 1},
-    {"MSGDLY2", MSGDLY2, 1},
+
     {"ENABLE",  ENABLE, 0},
     {"BSAEN",   BSAEN, 0},
     {"TRIGEN",  TRIGEN, 0},
     {"POL",     POL, 0},
-    {"EVENT",   EVENT, 0},
-    {"DMASK",   DMASK, 0},
+
+    {"RMODE",   RMODE, 0},
+    {"FRATE",   FRATE, 0},
+    {"ACRATE",  ACRATE, 0},
     {"DMODE",   DMODE, 0},
+
     {"TSMASK",  TSMASK, 0},
+    {"DMASK",   DMASK, 0},
+
     {"SEQ",     SEQ, 0},
     {"BSADEL",  BSADEL, 0},
     {"BSAWID",  BSAWID, 0},
     {"TRGDEL",  TRGDEL, 0},
     {"TRGWID",  TRGWID, 0},
     {"TRGFDEL", TRGFDEL, 0},
+
     {"CHANGE",  CHANGE, 0},
     {"COUNT",   COUNT, 0},
     {NULL,      -1, 0}
@@ -69,10 +75,12 @@ static struct {
     char *name;
 } initorder[] = {
     { POL,       "POL" },
-    { EVENT,     "EVENT" },
+    { RMODE,     "RMODE" },
+    { FRATE,     "FRATE" },
+    { ACRATE,    "ACRATE" },
+    { TSMASK,    "TSMASK" },
     { DMASK,     "DMASK" },
     { DMODE,     "DMODE" },
-    { TSMASK,    "TSMASK" },
     { SEQ,       "SEQ" },
     { BSADEL,    "BSADEL" },
     { BSAWID,    "BSAWID" },
@@ -124,6 +132,19 @@ static struct dpvtStruct *makeDpvt(tprCardStruct *pCard, int lcls, int chan, int
 
 int tprGetConfig(tprCardStruct *pCard, int chan, int reg)
 {
+    if (pCard->config.mode == 0) {    /* Defaults for non-existant LCLS-I PVs! */
+        switch (reg) {
+        case RMODE:
+            return TPR_ES_TYPE_SEQ;
+        case FRATE:
+        case ACRATE:
+        case TSMASK:
+        case DMASK:
+            return 0;
+        case DMODE:
+            return TPR_ES_DMODE_DK;
+        }
+    }
     switch (reg & 0xffffff00) {
     case 0x000:
         return pCard->config.global.boRecord[reg & 255]->val;
@@ -229,15 +250,57 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         WDEBUG(TPR_TR_CONTROL(chan), value);
         tprRegWrite(pCard->devpvt, TPR_TR_CONTROL(chan), value);
         return 1;
-    case EVENT: {
+    case RMODE: {
         u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
-        if (value < 7) {           // Fixed rate
-            eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_FIXED(value);
-        } else if (value < 13) {   // AC rate
-            eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_AC(value - 7, tprGetConfig(pCard, chan, TSMASK));
-        } else if (value == 13) {  // Sequence
+        switch (value) {
+        case TPR_ES_TYPE_FIXED:
+            eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_FIXED(tprGetConfig(pCard, chan, FRATE));
+            break;
+        case TPR_ES_TYPE_AC:
+            eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_AC(tprGetConfig(pCard, chan, ACRATE),
+                                                                     tprGetConfig(pCard, chan, TSMASK));
+            break;
+        case TPR_ES_TYPE_SEQ:
             eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_SEQ(tprGetConfig(pCard, chan, SEQ));
+            break;
         }
+        WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
+        tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
+        return 1;
+    }
+    case FRATE: {
+        u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
+        if (TPR_ES_TYPESELECT(eventSelect) != TPR_ES_TYPE(TPR_ES_TYPE_FIXED))
+            return 0;
+        eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_FIXED(value);
+        WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
+        tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
+        return 1;
+    }
+    case ACRATE: {
+        u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
+        if (TPR_ES_TYPESELECT(eventSelect) != TPR_ES_TYPE(TPR_ES_TYPE_AC))
+            return 0;
+        eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_TSSELECT(eventSelect) | TPR_ES_AC(value, 0);
+        WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
+        tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
+        return 1;
+    }
+    case TSMASK: {
+        u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
+        if (TPR_ES_TYPESELECT(eventSelect) != TPR_ES_TYPE(TPR_ES_TYPE_AC))
+            return 0;
+        eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_ACSELECT(eventSelect) | TPR_ES_TS(value);
+        WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
+        tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
+        return 1;
+    }
+    case SEQ: {
+        u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
+        // Write if LCLS-I or we are really in sequencer mode.
+        if (pCard->config.mode != 0 && TPR_ES_TYPESELECT(eventSelect) != TPR_ES_TYPE(TPR_ES_TYPE_SEQ))
+            return 0;
+        eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_SEQ(value);
         WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
         tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
         return 1;
@@ -256,24 +319,6 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
         return 1;
     }
-    case TSMASK: {
-        u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
-        if (TPR_ES_TYPESELECT(eventSelect) != TPR_ES_TYPE_AC)
-            return 0;
-        eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_ACSELECT(eventSelect) | TPR_ES_TS(value);
-        WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
-        tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
-        return 1;
-    }
-    case SEQ: {
-        u32 eventSelect = tprRegRead(pCard->devpvt, TPR_CH_EVTSEL(chan));
-        if (TPR_ES_TYPESELECT(eventSelect) != TPR_ES_TYPE_SEQ)
-            return 0;
-        eventSelect = TPR_ES_DESTSELECT(eventSelect) | TPR_ES_SEQ(value);
-        WDEBUG(TPR_CH_EVTSEL(chan), eventSelect);
-        tprRegWrite(pCard->devpvt, TPR_CH_EVTSEL(chan), eventSelect);
-        return 1;
-    }
     case BSADEL:
         if (value < 0) {
             WDEBUG(TPR_CH_BSADELAY(chan), TPR_BSADEL_NEG(value));
@@ -288,11 +333,8 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         tprRegWrite(pCard->devpvt, TPR_CH_BSAWIDTH(chan), value);
         return 0;
     case TRGDEL:
-        if (pCard->config.mode == 0) {
-            value += pCard->lcls1_msgdly;
-            if (value < 0)
-                value = 0;
-        }
+        if (value < 0)
+            value = 0;
         WDEBUG(TPR_TR_DELAY(chan), value);
         tprRegWrite(pCard->devpvt, TPR_TR_DELAY(chan), value);
         return 1;
@@ -306,12 +348,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         WDEBUG(TPR_TR_FINEDEL(chan), value);
         tprRegWrite(pCard->devpvt, TPR_TR_FINEDEL(chan), value);
         return 1;
-    case MSGDLY1:
-        if (tprDebug & TPR_DEBUG_WRITE)
-            printf("WRITE %d (0x%x) --> MSGDLY1 (%p)\n", value, value, &pCard->lcls1_msgdly);
-        pCard->lcls1_msgdly = value;
-        return 0;
-    case MSGDLY2:
+    case MSGDLY:
         WDEBUG(TPR_MSGDLY, value);
         tprRegWrite(pCard->devpvt, TPR_MSGDLY, value);
         return 0;  /* MCB - Not really, but probably not worth the effort to make this work. */
@@ -340,8 +377,7 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
 
 /*
  * Logic here:
- *    dpvt->idx == MSGDLY1|MSGDLY2     --> always write, as LCLS-I is actually software
- *                                         and the HW is always LCLS-II.
+ *    dpvt->idx == MSGDLY              --> always write, as this isn't touched in LCLS-I.
  *    dpvt->lcls == -2                 --> always write!
  *    pCard->config.mode == -1         --> We aren't initialized, don't write 
  *                                         anything except the "always write" values.
@@ -354,8 +390,8 @@ int tprWrite(tprCardStruct *pCard, int reg, int chan, int value)
         struct dpvtStruct *dpvt = (struct dpvtStruct *)pRec->dpvt;            \
         tprCardStruct *pCard = dpvt->pCard;                                   \
         int mode = pCard->config.mode;                                        \
-        if (dpvt->lcls != -2 && dpvt->idx != MSGDLY1 && dpvt->idx != MSGDLY2 && \
-            (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode)))      \
+        if (dpvt->lcls != -2 && dpvt->idx != MSGDLY &&                        \
+            (mode < 0 || (dpvt->lcls >= 0 && dpvt->lcls != mode)))            \
             return 0;                                                         \
         if (tprWrite(pCard, dpvt->idx, dpvt->chan, pRec->FIELD))              \
             scanIoRequest(pCard->config.lcls[mode][dpvt->chan].ioscan);       \
@@ -430,14 +466,14 @@ static epicsStatus tprProclonginRecord(longinRecord *pRec)
             pRec->udf = 0;
             break;
         case COUNT:
-            pRec->val = tprRegRead(pCard->devpvt, TPR_CH_EVTCNT(dpvt->chan));
+            pRec->val = tprRegRead(pCard->devpvt, TPR_CH_EVTCNT(dpvt->chan)) & 0x7fffffff;/* No negative counts! */
             pRec->udf = 0;
             break;
         }
     } else {
         switch (dpvt->idx) {
         case FRAME:
-            pRec->val = tprRegRead(pCard->devpvt, TPR_FRAMECNT & 0x7fffffff); /* Let's not deal with negative counts! */
+            pRec->val = tprRegRead(pCard->devpvt, TPR_FRAMECNT) & 0x7fffffff; /* No negative counts! */
             pRec->udf = 0;
             break;
         }

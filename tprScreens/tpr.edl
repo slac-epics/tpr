@@ -3,9 +3,9 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 2134
-y 71
-w 884
+x 420
+y 108
+w 929
 h 972
 font "helvetica-medium-r-18.0"
 ctlFont "helvetica-medium-r-12.0"
@@ -48,7 +48,7 @@ minor 0
 release 0
 x 0
 y 0
-w 880
+w 928
 h 40
 lineColor index 56
 fill
@@ -82,7 +82,7 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 820
+x 876
 y 8
 w 48
 h 24
@@ -343,7 +343,7 @@ minor 0
 release 0
 x 8
 y 132
-w 866
+w 912
 h 816
 lineColor index 3
 fill
@@ -356,7 +356,7 @@ beginObjectProperties
 major 4
 minor 7
 release 0
-x 664
+x 788
 y 948
 w 128
 h 20
@@ -417,7 +417,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 488
+x 508
 y 140
 w 80
 h 16
@@ -427,7 +427,7 @@ fgColor index 14
 bgColor index 3
 useDisplayBg
 value {
-  "Req Width(us)"
+  "Req Width(ns)"
 }
 endObjectProperties
 
@@ -437,7 +437,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 420
+x 440
 y 156
 w 52
 h 16
@@ -457,7 +457,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 668
+x 688
 y 156
 w 96
 h 16
@@ -477,7 +477,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 752
+x 780
 y 140
 w 56
 h 16
@@ -499,7 +499,7 @@ minor 1
 release 0
 x 12
 y 172
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -510,16 +510,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=0,L=1,TPR=$(TPR)"
-  1 "CH=0,L=2,TPR=$(TPR)"
+  0 "CH=0,TPR=$(TPR)"
+  1 "CH=0,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -539,7 +539,7 @@ minor 1
 release 0
 x 12
 y 236
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -550,16 +550,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=1,L=1,TPR=$(TPR)"
-  1 "CH=1,L=2,TPR=$(TPR)"
+  0 "CH=1,TPR=$(TPR)"
+  1 "CH=1,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -599,7 +599,7 @@ minor 1
 release 0
 x 12
 y 300
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -610,16 +610,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=2,L=1,TPR=$(TPR)"
-  1 "CH=2,L=2,TPR=$(TPR)"
+  0 "CH=2,TPR=$(TPR)"
+  1 "CH=2,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -639,7 +639,7 @@ minor 1
 release 0
 x 12
 y 364
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -650,16 +650,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=3,L=1,TPR=$(TPR)"
-  1 "CH=3,L=2,TPR=$(TPR)"
+  0 "CH=3,TPR=$(TPR)"
+  1 "CH=3,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -679,7 +679,7 @@ minor 1
 release 0
 x 12
 y 428
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -690,16 +690,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=4,L=1,TPR=$(TPR)"
-  1 "CH=4,L=2,TPR=$(TPR)"
+  0 "CH=4,TPR=$(TPR)"
+  1 "CH=4,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -719,7 +719,7 @@ minor 1
 release 0
 x 12
 y 492
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -730,16 +730,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=5,L=1,TPR=$(TPR)"
-  1 "CH=5,L=2,TPR=$(TPR)"
+  0 "CH=5,TPR=$(TPR)"
+  1 "CH=5,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -759,7 +759,7 @@ minor 1
 release 0
 x 12
 y 556
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -770,16 +770,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=6,L=1,TPR=$(TPR)"
-  1 "CH=6,L=2,TPR=$(TPR)"
+  0 "CH=6,TPR=$(TPR)"
+  1 "CH=6,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -799,7 +799,7 @@ minor 1
 release 0
 x 12
 y 620
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -810,16 +810,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=7,L=1,TPR=$(TPR)"
-  1 "CH=7,L=2,TPR=$(TPR)"
+  0 "CH=7,TPR=$(TPR)"
+  1 "CH=7,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -839,7 +839,7 @@ minor 1
 release 0
 x 12
 y 684
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -850,16 +850,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=8,L=1,TPR=$(TPR)"
-  1 "CH=8,L=2,TPR=$(TPR)"
+  0 "CH=8,TPR=$(TPR)"
+  1 "CH=8,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -879,7 +879,7 @@ minor 1
 release 0
 x 12
 y 748
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -890,16 +890,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=9,L=1,TPR=$(TPR)"
-  1 "CH=9,L=2,TPR=$(TPR)"
+  0 "CH=9,TPR=$(TPR)"
+  1 "CH=9,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -919,7 +919,7 @@ minor 1
 release 0
 x 12
 y 812
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -930,16 +930,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=A,L=1,TPR=$(TPR)"
-  1 "CH=A,L=2,TPR=$(TPR)"
+  0 "CH=A,TPR=$(TPR)"
+  1 "CH=A,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -959,7 +959,7 @@ minor 1
 release 0
 x 12
 y 876
-w 858
+w 904
 h 64
 fgColor index 14
 bgColor index 0
@@ -970,16 +970,16 @@ filePv "LOC\\emb-trig=0"
 sizeOfs 5
 numDsps 2
 displayFileName {
-  0 "tprScreens/emb-trig.edl"
-  1 "tprScreens/emb-trig.edl"
+  0 "tprScreens/emb-trig1.edl"
+  1 "tprScreens/emb-trig2.edl"
 }
 menuLabel {
   0 "LCLS I"
   1 "LCLS II"
 }
 symbols {
-  0 "CH=B,L=1,TPR=$(TPR)"
-  1 "CH=B,L=2,TPR=$(TPR)"
+  0 "CH=B,TPR=$(TPR)"
+  1 "CH=B,TPR=$(TPR)"
 }
 replaceSymbols {
   0 1
@@ -1202,7 +1202,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 228
+x 248
 y 140
 w 60
 h 16
@@ -1222,7 +1222,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 296
+x 316
 y 140
 w 48
 h 16
@@ -1242,7 +1242,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 576
+x 596
 y 140
 w 84
 h 16
@@ -1252,7 +1252,7 @@ fgColor index 14
 bgColor index 3
 useDisplayBg
 value {
-  "Req Delay(us)"
+  "Req Delay(ns)"
 }
 endObjectProperties
 
@@ -1262,7 +1262,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 416
+x 436
 y 140
 w 64
 h 16
@@ -1282,7 +1282,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 352
+x 372
 y 140
 w 64
 h 16
@@ -1302,7 +1302,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 668
+x 688
 y 140
 w 68
 h 16
@@ -1322,7 +1322,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 824
+x 856
 y 140
 w 40
 h 16
@@ -1362,7 +1362,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 228
+x 248
 y 156
 w 60
 h 16
@@ -1382,7 +1382,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 288
+x 308
 y 156
 w 64
 h 16
@@ -1402,7 +1402,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 488
+x 508
 y 156
 w 80
 h 16
@@ -1412,7 +1412,7 @@ fgColor index 14
 bgColor index 3
 useDisplayBg
 value {
-  "Act Width(us)"
+  "Act Width(ns)"
 }
 endObjectProperties
 
@@ -1422,7 +1422,7 @@ beginObjectProperties
 major 4
 minor 1
 release 1
-x 576
+x 596
 y 156
 w 84
 h 16
@@ -1432,7 +1432,7 @@ fgColor index 14
 bgColor index 3
 useDisplayBg
 value {
-  "Act Delay(us)"
+  "Act Delay(ns)"
 }
 endObjectProperties
 

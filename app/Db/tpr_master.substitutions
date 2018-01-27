@@ -1,7 +1,7 @@
 file tpr_config.template
 {
-pattern {  IOC    }
-        { $(IOC) }
+pattern {  RATE2                   }
+        { "\$(RATE2=5.3846153846)" }
 }
 
 file tpr_ch_config.template

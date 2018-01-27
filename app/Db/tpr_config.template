@@ -68,50 +68,73 @@ record(mbbi, "$(BASE):STATUS")
   field(UNSV, "INVALID")
 }
 
-record(longout, "$(BASE):LCLS1:MSGDELAY")
+record(ao, "$(BASE):LCLS1:MSGDELAY")
 {
   field(DESC,  "TPR LCLS1 Message Delay")
-  field(DTYP,  "TPR Master")
-  field(PINI,  "YES")
-  field(OUT,   "@$(CARD) 1 - MSGDLY1")
-  field(OMSL,  "supervisory")
+  field(EGU,   "ns")
   field(FLNK,  "$(BASE):LCLS1:MDFANOUT")
 }
 
 record(fanout, "$(BASE):LCLS1:MDFANOUT")
 {
   field(SELM, "All")
-  field(LNK1, "$(BASE):LCLS1:CH0:TRIG_DELAY_TICKS")
-  field(LNK2, "$(BASE):LCLS1:CH1:TRIG_DELAY_TICKS")
-  field(LNK3, "$(BASE):LCLS1:CH2:TRIG_DELAY_TICKS")
-  field(LNK4, "$(BASE):LCLS1:CH3:TRIG_DELAY_TICKS")
-  field(LNK5, "$(BASE):LCLS1:CH4:TRIG_DELAY_TICKS")
+  field(LNK1, "$(BASE):LCLS1:CH0:TRIG_DELAY_CVT")
+  field(LNK2, "$(BASE):LCLS1:CH1:TRIG_DELAY_CVT")
+  field(LNK3, "$(BASE):LCLS1:CH2:TRIG_DELAY_CVT")
+  field(LNK4, "$(BASE):LCLS1:CH3:TRIG_DELAY_CVT")
+  field(LNK5, "$(BASE):LCLS1:CH4:TRIG_DELAY_CVT")
   field(LNK6, "$(BASE):LCLS1:MDFANOUT2")
 }
 
 record(fanout, "$(BASE):LCLS1:MDFANOUT2")
 {
   field(SELM, "All")
-  field(LNK1, "$(BASE):LCLS1:CH5:TRIG_DELAY_TICKS")
-  field(LNK2, "$(BASE):LCLS1:CH6:TRIG_DELAY_TICKS")
-  field(LNK3, "$(BASE):LCLS1:CH7:TRIG_DELAY_TICKS")
-  field(LNK4, "$(BASE):LCLS1:CH8:TRIG_DELAY_TICKS")
-  field(LNK5, "$(BASE):LCLS1:CH9:TRIG_DELAY_TICKS")
+  field(LNK1, "$(BASE):LCLS1:CH5:TRIG_DELAY_CVT")
+  field(LNK2, "$(BASE):LCLS1:CH6:TRIG_DELAY_CVT")
+  field(LNK3, "$(BASE):LCLS1:CH7:TRIG_DELAY_CVT")
+  field(LNK4, "$(BASE):LCLS1:CH8:TRIG_DELAY_CVT")
+  field(LNK5, "$(BASE):LCLS1:CH9:TRIG_DELAY_CVT")
   field(LNK6, "$(BASE):LCLS1:MDFANOUT3")
 }
 
 record(fanout, "$(BASE):LCLS1:MDFANOUT3")
 {
   field(SELM, "All")
-  field(LNK1, "$(BASE):LCLS1:CHA:TRIG_DELAY_TICKS")
-  field(LNK2, "$(BASE):LCLS1:CHB:TRIG_DELAY_TICKS")
+  field(LNK1, "$(BASE):LCLS1:CHA:TRIG_DELAY_CVT")
+  field(LNK2, "$(BASE):LCLS1:CHB:TRIG_DELAY_CVT")
 }
 
-record(longout, "$(BASE):LCLS2:MSGDELAY")
+record(ao, "$(BASE):LCLS2:MSGDELAY")
+{
+  field(DESC,  "TPR LCLS2 Message Delay")
+  field(EGU,   "ns")
+  field(FLNK,  "$(BASE):LCLS2:MSGDELAY_CVT.PROC")
+}
+
+record(calcout, "$(BASE):LCLS2:MSGDELAY_CVT")
+{
+  field(INPA, "$(BASE):LCLS:MSGDELAY")
+  field(INPB, "$(RATE2)")
+  field(CALC, "FLOOR((A/B)+0.5)")
+  field(OUT,  "$(BASE):LCLS2:MSGDELAY_TICKS PP")
+}
+
+record(longout, "$(BASE):LCLS2:MSGDELAY_TICKS")
 {
   field(DESC,  "TPR LCLS2 Message Delay")
   field(DTYP,  "TPR Master")
-  field(PINI,  "YES")
-  field(OUT,   "@$(CARD) 2 - MSGDLY2")
+  field(OUT,   "@$(CARD) 2 - MSGDLY")
   field(OMSL,  "supervisory")
+}
+
+record(longout, "$(BASE):LCLS1")
+{
+  field(DESC,  "TPR LCLS1 ID")
+  field(VAL,   "1")
+}
+
+record(longout, "$(BASE):LCLS2")
+{
+  field(DESC,  "TPR LCLS2 ID")
+  field(VAL,   "2")
 }
