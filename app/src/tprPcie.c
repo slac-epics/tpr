@@ -250,7 +250,7 @@ static int tprIrqHandlerThread(void *p)
         fd_set rds = all;
 
         cnt = select(mfd, &rds, NULL, NULL, NULL);
-        if (cnt < 0)
+        if (cnt < 0) 
             continue;  /* Assume we were just interrupted? */
 
         if (have_bsa && FD_ISSET(devpvt->fd[DEVNODE_MINOR_BSA], &rds)) {
