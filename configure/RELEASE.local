@@ -13,8 +13,8 @@
 
 # ==========================================================
 # Define the version strings for all needed modules
-TIMING_API_MODULE_VERSION	= R0.6
-DIAG_TIMER_MODULE_VERSION	= R1.9.1
+TIMING_API_MODULE_VERSION	= R0.8
+DIAG_TIMER_MODULE_VERSION	= R1.9.2
 
 # ==========================================================
 # External Support module path definitions

@@ -378,6 +378,21 @@ int RegisterBsaTimingCallback( BsaTimingCallback callback, void * pUserPvt )
 }
 
 /**
+ * timingGetCurBsaPattern()
+ *   - pCurBsaPatternRet is a pointer used to return the most recent BSA timing data
+ *
+ * Returns the most recently arrived BSA timing pattern data.
+ */
+int timingGetCurBsaPattern(BsaTimingData *pNewPattern)
+{
+    if (pattern.pulseId != 0) {
+        *pNewPattern = pattern;
+        return 0;
+    } else
+        return 1;
+}
+
+/**
  * The timingFifoRead() call allows a timingFifo client to access a
  * FIFO queue of the last MAX_TS_QUEUE eventCode arrival timestamps.
  * Each client has their own index position in the queue which can be controlled w/ the incr argument.
